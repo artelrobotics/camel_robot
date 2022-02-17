@@ -40,9 +40,9 @@ depth:
     depth_downsample_factor:    1.0                             # Resample factor for depth data matrices [0.01,1.0] The SDK works with native data sizes, but publishes rescaled matrices (depth map, point cloud, ...)
 
 pos_tracking:
-    pos_tracking_enabled:       true                            # True to enable positional tracking from start
-    publish_tf:                 true                            # publish `odom -> base_link` TF
-    publish_map_tf:             true                            # publish `map -> odom` TF
+    pos_tracking_enabled:       false                            # True to enable positional tracking from start
+    publish_tf:                 false                            # publish `odom -> base_link` TF
+    publish_map_tf:             false                            # publish `map -> odom` TF
     map_frame:                  'map'                           # main frame
     odometry_frame:             'odom'                          # odometry frame
     area_memory_db_path:        'zed_area_memory.area'          # file loaded when the node starts to restore the "known visual features" map. 
@@ -50,7 +50,7 @@ pos_tracking:
     area_memory:                true                            # Enable to detect loop closure
     floor_alignment:            false                           # Enable to automatically calculate camera/floor offset
     initial_base_pose:          [0.0,0.0,0.0, 0.0,0.0,0.0]      # Initial position of the `base_frame` -> [X, Y, Z, R, P, Y]
-    init_odom_with_first_valid_pose: true                       # Enable to initialize the odometry with the first valid pose
+    init_odom_with_first_valid_pose: false                       # Enable to initialize the odometry with the first valid pose
     path_pub_rate:              2.0                             # Camera trajectory publishing frequency
     path_max_count:             -1                              # use '-1' for unlimited path size
     two_d_mode:                 false                           # Force navigation on a plane. If true the Z value will be fixed to "fixed_z_value", roll and pitch to zero

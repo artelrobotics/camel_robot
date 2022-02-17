@@ -140,9 +140,9 @@
         <!-- Front ZED2 -->
         <node name="zed2" pkg="zed_wrapper" type="zed_wrapper_node" output="$(arg output)" ns="front" required="true">
             <rosparam file="$(find camel_robot)/config/bringup/zed2_front_config.yaml" command="load" />
-            <rosparam file="$(find camel_robot)/config/bringup/zed2_common_config.yam" command="load" />
-            <param name="general/camera_name"               value="front/zed2" />
-            <param name="general/base_frame"                value="$(arg base_frame)" />
+            <rosparam file="$(find camel_robot)/config/bringup/zed2_common_config.yaml" command="load" />
+            <param name="general/camera_name"               value="$(arg robot_name)/zed_front" />
+            <param name="general/base_frame"                value="$(arg robot_name)/$(arg base_frame)" />
             <param name="svo_file"                          value="" />
             <param name="stream"                            value="" />
             <param name="general/zed_id"                    value="0" />
@@ -150,12 +150,11 @@
             <param name="general/serial_number"             value="28998504" />
         </node>
 
-        <!-- Back  ZED2 -->
         <node name="zed2" pkg="zed_wrapper" type="zed_wrapper_node" output="$(arg output)" ns="back" required="true">
-            <rosparam file="$(find camel_robot)/config/bringup/zed2_back_config.yam" command="load" />
-            <rosparam file="$(find camel_robot)/config/bringup/zed2_common_config.yam" command="load" />
-            <param name="general/camera_name"               value="back/zed2" />
-            <param name="general/base_frame"                value="$(arg base_frame)" />
+            <rosparam file="$(find camel_robot)/config/bringup/zed2_back_config.yaml" command="load" />
+            <rosparam file="$(find camel_robot)/config/bringup/zed2_common_config.yaml" command="load" />
+            <param name="general/camera_name"               value="$(arg robot_name)/zed_back" />
+            <param name="general/base_frame"                value="$(arg robot_name)/$(arg base_frame)" />
             <param name="svo_file"                          value="" />
             <param name="stream"                            value="" />
             <param name="general/zed_id"                    value="1" />
