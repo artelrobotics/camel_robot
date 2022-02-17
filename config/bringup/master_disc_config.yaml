@@ -1,0 +1,15 @@
+log_level: "INFO"
+mcast_group: 224.0.0.251
+mcast_port: 11511
+interface: ""
+rpc_port: 11611
+rosmaster_hz: 1
+heartbeat_hz: 0.02
+measurement_intervals: 5
+timeout_factor: 10
+remove_after: 300
+active_request_after: 60
+robot_hosts: ["neo-pc"]
+change_notification_count: 3
+send_mcast: true
+listen_mcast: true

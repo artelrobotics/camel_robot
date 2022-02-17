@@ -1,0 +1,17 @@
+resync_on_reconnect: true
+resync_on_reconnect_timeout: 0
+do_not_sync: []
+ignore_hosts: []
+sync_hosts: []
+ignore_nodes: []
+sync_nodes: []
+ignore_topics: []
+ignore_publishers: []
+ignore_subscribers: []
+sync_topics: []
+ignore_services: []
+sync_services: []
+sync_topics_on_demand: false
+ignore_type: []
+sync_remote_nodes: false
+check_host: true 

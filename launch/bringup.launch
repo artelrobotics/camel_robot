@@ -1,0 +1,193 @@
+<?xml version="1.0"?>
+<launch>
+    <arg name="front_lidar_ip"        default="192.168.1.3" />
+    <arg name="back_lidar_ip"         default="192.168.1.4" />
+    <arg name="common_modbus_ip"      default="192.168.1.110" />
+    <arg name="lights_modbus_ip"      default="192.168.1.111" />
+    <arg name="robot_name"            default="$(env ROBOT_NAME)" />
+    <arg name="base_frame"            default="base_link" />
+    <arg name="output"                default="screen" />
+    <arg name="ws_port"                default="9090"/>
+
+    <group ns="$(arg robot_name)">
+
+        <!-- Robot Description -->
+        <param name="use_gui" value="false" />
+        <param name="robot_description" command="$(find xacro)/xacro '$(find camel_urdf)/urdf/CAMEL-1000.urdf.xacro'  robot_model:=$(arg robot_name)
+        base_frame:=$(arg base_frame)"/>
+
+        <!-- Joint State -->
+        <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher" respawn="true" output="$(arg output)"/>
+        <!-- Robot State  -->
+        <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" respawn="true" output="$(arg output)"/>
+
+
+        <!-- SICK lidars launch -->
+        <!-- Front Lidar -->
+        <node name="sick_lms" pkg="sick_scan" type="sick_generic_caller" respawn="false" output="$(arg output)" ns="front_lidar" required='true'>
+            <param name="intensity" type="bool" value="False"/>
+            <param name="intensity_resolution_16bit" type="bool" value="false"/>
+            <param name="min_ang" type="double" value="-2.35619"/>
+            <param name="max_ang" type="double" value="2.35619"/>
+            <param name="frame_id" type="str" value="$(arg robot_name)/front_lidar"/>
+            <param name="use_binary_protocol" type="bool" value="true"/>
+            <param name="scanner_type" type="string" value="sick_lms_1xx"/>
+            <param name="range_max" type="double" value="25.0"/>
+            <param name="hostname" type="string" value="$(arg front_lidar_ip)"/>
+            <param name="port" type="string" value="2112"/>
+            <param name="timelimit" type="int" value="5"/>
+            <param name="start_services" type="bool" value="false"/>
+            <param name="activate_lferec" type="bool" value="false"/>
+            <param name="activate_lidoutputstate" type="bool" value="false"/> 
+            <param name="activate_lidinputstate" type="bool" value="false"/> 
+            <param name="min_intensity" type="double" value="0.0"/> 
+        </node>
+
+        <!-- Back Lidar -->
+        <node name="sick_lms" pkg="sick_scan" type="sick_generic_caller" respawn="false" output="$(arg output)" ns="back_lidar" required='true'>
+            <param name="intensity" type="bool" value="False"/>
+            <param name="intensity_resolution_16bit" type="bool" value="false"/>
+            <param name="min_ang" type="double" value="-2.35619"/>
+            <param name="max_ang" type="double" value="2.35619"/>
+            <param name="frame_id" type="str" value="$(arg robot_name)/back_lidar"/>
+            <param name="use_binary_protocol" type="bool" value="true"/>
+            <param name="scanner_type" type="string" value="sick_lms_1xx"/>
+            <param name="range_max" type="double" value="25.0"/>
+            <param name="hostname" type="string" value="$(arg back_lidar_ip)"/>
+            <param name="port" type="string" value="2112"/>
+            <param name="timelimit" type="int" value="5"/>
+            <param name="start_services" type="bool" value="false"/>
+            <param name="activate_lferec" type="bool" value="false"/>
+            <param name="activate_lidoutputstate" type="bool" value="false"/> 
+            <param name="activate_lidinputstate" type="bool" value="false"/> 
+            <param name="min_intensity" type="double" value="0.0"/> 
+        </node>
+
+        <!-- Two lidars merger -->
+        
+        <node pkg="ira_laser_tools" name="laserscan_multi_merger" type="laserscan_multi_merger" output="$(arg output)">
+            <param name="destination_frame" value="$(arg robot_name)/base_link"/>
+            <param name="cloud_destination_topic" value="/$(arg robot_name)/merged_cloud"/>
+            <param name="scan_destination_topic" value="/$(arg robot_name)/scan"/>
+            <param name="laserscan_topics" value ="/$(arg robot_name)/front_lidar/scan /$(arg robot_name)/back_lidar/scan" /> 
+            <param name="angle_min" value="-2.35619449615"/>
+            <param name="angle_max" value="2.35619449615"/>
+            <param name="angle_increment" value="0.00872664619237"/>
+            <param name="scan_time" value="0.0333333"/>
+            <param name="range_min" value="0.30"/>
+            <param name="range_max" value="50.0"/>
+        </node>
+        
+
+        <!-- I/O module -->
+        <!-- for common i/o  -->
+        <node pkg="ethernet_remote_io_module" name="remote_io" type="modbus_node.py" output="$(arg output)" ns="common" required='true'>
+            <param name="ip_address" value="$(arg common_modbus_ip)"/>
+            <param name="port" value="502"/>
+            <param name="rate" value="10"/>
+        </node>
+
+        <!-- for lights  -->
+        <node pkg="ethernet_remote_io_module" name="remote_io" type="modbus_node.py" output="$(arg output)" ns="ligths" required='true'>
+            <param name="ip_address" value="$(arg lights_modbus_ip)"/>
+            <param name="port" value="502"/>
+            <param name="rate" value="10"/>
+        </node>
+
+        <!-- IMU Sensor -->
+        <node pkg="razor_imu_9dof" type="imu_node.py" name="imu_node" output="$(arg output)" required='true'>
+            <rosparam file="$(find camel_robot)/config/bringup/razor_imu_config.yaml" command="load"/>
+            <param name="port"       value="/dev/ttyIMU"/>
+            <param name="frame_id"   value="$(arg robot_name)/imu"/>
+            <remap from="/$(arg robot_name)/imu" to="/$(arg robot_name)/imu/data_raw"/>
+        </node>
+
+        <node pkg="imu_complementary_filter" type="complementary_filter_node" name="complementary_filter" output="$(arg output)" required='true'>
+            <param name="do_bias_estimation" value="true"/>
+            <param name="do_adaptive_gain"   value="true"/>
+            <param name="use_mag"            value="false"/>
+            <param name="gain_acc"           value="0.01"/>
+            <param name="gain_mag"           value="0.01"/>
+            <param name="publish_tf"         value="false"/>
+        </node>
+
+        <!-- Roboteq drivers -->
+        <!-- bms -->
+        <node name="roboteq_bms"  pkg="roboteq_bms" type="roboteq_bms.py"  output="$(arg output)" respawn="true" respawn_delay="10" required='true'>
+            <param name="port"         value="/dev/ttyTHS1"/>
+            <param name="baud"         value="115200"/>
+            <param name="desired_freq" value="5"/>
+        </node>
+
+        <!-- motor driver -->
+        <node name = "roboteq_driver" pkg = "roboteq_motor_controller_driver" type = "roboteq_motor_controller_driver_node" output="$(arg output)" required='true'>
+            <rosparam command="load" file="$(find camel_robot)/config/bringup/motor_driver_config.yaml" />
+            <param name="port"  value="/dev/ttyTHS0"/>
+            <param name="baud"  value="115200"/>
+        </node>
+
+        <!-- encoder odometry -->
+        <node name = "diff_odom" pkg = "roboteq_motor_controller_driver" type = "diff_odom" output="$(arg output)" required='true'>
+            <rosparam command="load" file="$(find camel_robot)/config/bringup/odom_encoder_config.yaml" />
+            <param name="base_frame"            value="$(arg robot_name)/base_link"/>
+            <param name="odom_frame"            value="$(arg robot_name)/odom"/>
+            <parapm name="encoder_topic_name"   value="/$(arg robot_name)/roboteq_driver/encoder_count" />
+            <parapm name="command_srv"          value="/$(arg robot_name)/roboteq_driver/dualchannel_command_service" />
+        </node>
+
+
+        <!-- ZED Camera -->
+        <!-- Front ZED2 -->
+        <node name="zed2" pkg="zed_wrapper" type="zed_wrapper_node" output="$(arg output)" ns="front" required="true">
+            <rosparam file="$(find camel_robot)/config/bringup/zed2_front_config.yaml" command="load" />
+            <rosparam file="$(find camel_robot)/config/bringup/zed2_common_config.yam" command="load" />
+            <param name="general/camera_name"               value="front/zed2" />
+            <param name="general/base_frame"                value="$(arg base_frame)" />
+            <param name="svo_file"                          value="" />
+            <param name="stream"                            value="" />
+            <param name="general/zed_id"                    value="0" />
+            <param name="general/gpu_id"                    value="-1" />
+            <param name="general/serial_number"             value="28998504" />
+        </node>
+
+        <!-- Back  ZED2 -->
+        <node name="zed2" pkg="zed_wrapper" type="zed_wrapper_node" output="$(arg output)" ns="back" required="true">
+            <rosparam file="$(find camel_robot)/config/bringup/zed2_back_config.yam" command="load" />
+            <rosparam file="$(find camel_robot)/config/bringup/zed2_common_config.yam" command="load" />
+            <param name="general/camera_name"               value="back/zed2" />
+            <param name="general/base_frame"                value="$(arg base_frame)" />
+            <param name="svo_file"                          value="" />
+            <param name="stream"                            value="" />
+            <param name="general/zed_id"                    value="1" />
+            <param name="general/gpu_id"                    value="-1" />
+            <param name="general/serial_number"             value="29520794" />
+        </node>
+
+
+
+        <!-- Multimaster -->
+        <!-- Multimaster Discovery -->
+        <node name="master_discovery" pkg="fkie_master_discovery" type="master_discovery" output="$(arg output)">
+            <rosparam command="load" file="$(find camel_robot)/config/bringup/master_disc_config.yaml"/>
+        </node>
+
+        <!-- Multimaster Sync -->
+        <node name="master_sync" pkg="fkie_master_sync" type="master_sync" output="$(arg output)">
+            <rosparam command="load" file="$(find camel_robot)/config/bringup/master_sync_config.yaml"/>
+        </node>
+        
+        
+        <!-- Rosbridge Websocket -->
+        <node name="rosbridge_websocket" pkg="rosbridge_server" type="rosbridge_websocket" output="$(arg output)">
+            <rosparam command="load" file="$(find camel_robot)/config/bringup/rosbridge_ws_config.yaml"/>
+            <param name="port" value="$(arg ws_port)"/>
+            <param name="address" value="$(env HOSTNAME)"/>
+            <rosparam command="load" file="$(find camel_robot)/config/bringup/rosbridge_glob_config.yaml"/>
+        </node>
+
+        <node name="rosapi" pkg="rosapi" type="rosapi_node" output="$(arg output)">
+            <rosparam command="load" file="$(find camel_robot)/config/bringup/rosbridge_glob_config.yaml"/>
+        </node>
+
+    </group>
+</launch>
