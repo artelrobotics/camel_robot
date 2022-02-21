@@ -7,7 +7,7 @@
     <arg name="robot_name"            default="$(env ROBOT_NAME)" />
     <arg name="base_frame"            default="base_link" />
     <arg name="output"                default="screen" />
-    <arg name="ws_port"                default="9090"/>
+    <arg name="ws_port"               default="9090"/>
 
     <group ns="$(arg robot_name)">
 
@@ -114,7 +114,7 @@
         <!-- Roboteq drivers -->
         <!-- bms -->
         <node name="roboteq_bms"  pkg="roboteq_bms" type="roboteq_bms.py"  output="$(arg output)" respawn="true" respawn_delay="10" required='true'>
-            <param name="port"         value="/dev/ttyTHS1"/>
+            <param name="port"         value="/dev/RoboteqBMS"/>
             <param name="baud"         value="115200"/>
             <param name="desired_freq" value="5"/>
         </node>
@@ -122,7 +122,7 @@
         <!-- motor driver -->
         <node name = "roboteq_driver" pkg = "roboteq_motor_controller_driver" type = "roboteq_motor_controller_driver_node" output="$(arg output)" required='true'>
             <rosparam command="load" file="$(find camel_robot)/config/bringup/motor_driver_config.yaml" />
-            <param name="port"  value="/dev/ttyTHS0"/>
+            <param name="port"  value="/dev/RoboteqDriver"/>
             <param name="baud"  value="115200"/>
         </node>
 
@@ -133,6 +133,8 @@
             <param name="odom_frame"            value="$(arg robot_name)/odom"/>
             <parapm name="encoder_topic_name"   value="/$(arg robot_name)/roboteq_driver/encoder_count" />
             <parapm name="command_srv"          value="/$(arg robot_name)/roboteq_driver/dualchannel_command_service" />
+            <parapm name="publish_tf"           value="false" />
+            <remap from="/$(arg robot_name)/diff_odom/odom"  to="/$(arg robot_name)/roboteq/odom"/>
         </node>
 
 
@@ -161,6 +163,16 @@
             <param name="general/gpu_id"                    value="-1" />
             <param name="general/serial_number"             value="29520794" />
         </node>
+
+
+        <!-- TODO -->
+        <!-- Placeholder for Hooks -->
+
+        <!-- <node pkg="camel_robot" name="hook_controller" type="hooks_control.py" output="$(arg output)"  required='true'>
+            <rosparam command="load" file="$(find camel_robot)/config/bringup/hook_control_config.yaml"/>
+         </node> -->
+
+        <!-- Placeholder for Lights -->
 
 
 

@@ -1,0 +1,32 @@
+<?xml version="1.0"?>
+<launch>
+    <arg name="robot_name"            default="$(env ROBOT_NAME)" />
+    <arg name="base_frame"            default="base_link" />
+    <arg name="output"                default="screen" />
+
+    <!-- Front ZED2 -->
+    <node name="zed2" pkg="zed_wrapper" type="zed_wrapper_node" output="$(arg output)" ns="front" required="true">
+        <rosparam file="$(find camel_robot)/config/bringup/zed2_front_config.yaml" command="load" />
+        <rosparam file="$(find camel_robot)/config/bringup/zed2_common_config.yaml" command="load" />
+        <param name="general/camera_name"               value="$(arg robot_name)/zed_front" />
+        <param name="general/base_frame"                value="$(arg robot_name)/$(arg base_frame)" />
+        <param name="svo_file"                          value="" />
+        <param name="stream"                            value="" />
+        <param name="general/zed_id"                    value="0" />
+        <param name="general/gpu_id"                    value="-1" />
+        <param name="general/serial_number"             value="28998504" />
+    </node>
+
+    <node name="zed2" pkg="zed_wrapper" type="zed_wrapper_node" output="$(arg output)" ns="back" required="true">
+        <rosparam file="$(find camel_robot)/config/bringup/zed2_back_config.yaml" command="load" />
+        <rosparam file="$(find camel_robot)/config/bringup/zed2_common_config.yaml" command="load" />
+        <param name="general/camera_name"               value="$(arg robot_name)/zed_back" />
+        <param name="general/base_frame"                value="$(arg robot_name)/$(arg base_frame)" />
+        <param name="svo_file"                          value="" />
+        <param name="stream"                            value="" />
+        <param name="general/zed_id"                    value="1" />
+        <param name="general/gpu_id"                    value="-1" />
+        <param name="general/serial_number"             value="29520794" />
+    </node>
+
+</launch>

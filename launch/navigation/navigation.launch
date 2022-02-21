@@ -1,0 +1,39 @@
+<?xml version="1.0"?>
+
+<launch>
+    <group ns="$(arg robot_name)">
+        <arg name="robot_name"            default="$(env ROBOT_NAME)" />
+        <arg name="base_frame"            default="base_link" />
+        <arg name="output"                default="screen" />
+        <!-- ****************** Arguments ******************** -->
+        <arg name="map_file" default="$(find camel_robot)/maps/map.yaml"/>
+
+        <!-- ************************ Map Server ************************* -->
+        <node name="map_server" pkg="map_server" type="map_server" args="$(arg map_file)" respawn="true">
+        </node>
+
+        <!-- ********************* Robot Localization ************************* -->
+        <include file="$(find camel_robot)/launch/slam/ekf_localization.launch">
+            <arg name="robot_name"            value="$(env ROBOT_NAME)" />
+            <arg name="base_frame"            value="$(arg base_frame)" />
+            <arg name="output"                value="$(arg output)" />
+        </include>
+
+        <!-- ********************* AMCL ************************* -->
+        <include file="$(find camel_robot)/launch/navigation/amcl.launch">
+            <arg name="robot_name"            value="$(env ROBOT_NAME)" />
+            <arg name="base_frame"            value="$(arg base_frame)" />
+            <arg name="output"                value="$(arg output)" />
+            <arg name="gui_publish_rate"      value="5.0" />
+        </include>
+
+        <!-- ************************ Move Base ******************** -->
+        <include file="$(find camel_robot)/launch/navigation/move_base.launch"/>
+	
+    </group>
+</launch>
+
+
+
+
+        

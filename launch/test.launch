@@ -11,18 +11,18 @@
 
     <group ns="$(arg robot_name)">
 
-        
-        <param name="use_gui" value="false" />
+       
+        <!-- <param name="use_gui" value="false" />
         <param name="robot_description" command="$(find xacro)/xacro '$(find camel_urdf)/urdf/CAMEL-1000.urdf.xacro'  robot_model:=$(arg robot_name)
         base_frame:=$(arg base_frame)"/>
 
-        
+    
         <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher" respawn="true" output="$(arg output)"/>
-       
+      
         <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" respawn="true" output="$(arg output)"/>
 
 
-     
+
         <node name="sick_lms" pkg="sick_scan" type="sick_generic_caller" respawn="false" output="$(arg output)" ns="front_lidar" required='true'>
             <param name="intensity" type="bool" value="False"/>
             <param name="intensity_resolution_16bit" type="bool" value="false"/>
@@ -42,7 +42,6 @@
             <param name="min_intensity" type="double" value="0.0"/> 
         </node>
 
-     
         <node name="sick_lms" pkg="sick_scan" type="sick_generic_caller" respawn="false" output="$(arg output)" ns="back_lidar" required='true'>
             <param name="intensity" type="bool" value="False"/>
             <param name="intensity_resolution_16bit" type="bool" value="false"/>
@@ -62,7 +61,6 @@
             <param name="min_intensity" type="double" value="0.0"/> 
         </node>
 
-
         
         <node pkg="ira_laser_tools" name="laserscan_multi_merger" type="laserscan_multi_merger" output="$(arg output)">
             <param name="destination_frame" value="$(arg robot_name)/base_link"/>
@@ -78,14 +76,14 @@
         </node>
         
 
- 
+
         <node pkg="ethernet_remote_io_module" name="remote_io" type="modbus_node.py" output="$(arg output)" ns="common" required='true'>
             <param name="ip_address" value="$(arg common_modbus_ip)"/>
             <param name="port" value="502"/>
             <param name="rate" value="10"/>
         </node>
 
-    
+
         <node pkg="ethernet_remote_io_module" name="remote_io" type="modbus_node.py" output="$(arg output)" ns="ligths" required='true'>
             <param name="ip_address" value="$(arg lights_modbus_ip)"/>
             <param name="port" value="502"/>
@@ -111,7 +109,7 @@
 
 
         <node name="roboteq_bms"  pkg="roboteq_bms" type="roboteq_bms.py"  output="$(arg output)" respawn="true" respawn_delay="10" required='true'>
-            <param name="port"         value="/dev/ttyTHS1"/>
+            <param name="port"         value="/dev/RoboteqBMS"/>
             <param name="baud"         value="115200"/>
             <param name="desired_freq" value="5"/>
         </node>
@@ -119,10 +117,9 @@
 
         <node name = "roboteq_driver" pkg = "roboteq_motor_controller_driver" type = "roboteq_motor_controller_driver_node" output="$(arg output)" required='true'>
             <rosparam command="load" file="$(find camel_robot)/config/bringup/motor_driver_config.yaml" />
-            <param name="port"  value="/dev/ttyTHS0"/>
+            <param name="port"  value="/dev/RoboteqDriver"/>
             <param name="baud"  value="115200"/>
         </node>
-
 
         <node name = "diff_odom" pkg = "roboteq_motor_controller_driver" type = "diff_odom" output="$(arg output)" required='true'>
             <rosparam command="load" file="$(find camel_robot)/config/bringup/odom_encoder_config.yaml" />
@@ -133,27 +130,53 @@
         </node>
 
 
+        <node name="zed2" pkg="zed_wrapper" type="zed_wrapper_node" output="$(arg output)" ns="front" required="true">
+            <rosparam file="$(find camel_robot)/config/bringup/zed2_front_config.yaml" command="load" />
+            <rosparam file="$(find camel_robot)/config/bringup/zed2_common_config.yaml" command="load" />
+            <param name="general/camera_name"               value="$(arg robot_name)/zed_front" />
+            <param name="general/base_frame"                value="$(arg robot_name)/$(arg base_frame)" />
+            <param name="svo_file"                          value="" />
+            <param name="stream"                            value="" />
+            <param name="general/zed_id"                    value="0" />
+            <param name="general/gpu_id"                    value="-1" />
+            <param name="general/serial_number"             value="28998504" />
+        </node>
+
+        <node name="zed2" pkg="zed_wrapper" type="zed_wrapper_node" output="$(arg output)" ns="back" required="true">
+            <rosparam file="$(find camel_robot)/config/bringup/zed2_back_config.yaml" command="load" />
+            <rosparam file="$(find camel_robot)/config/bringup/zed2_common_config.yaml" command="load" />
+            <param name="general/camera_name"               value="$(arg robot_name)/zed_back" />
+            <param name="general/base_frame"                value="$(arg robot_name)/$(arg base_frame)" />
+            <param name="svo_file"                          value="" />
+            <param name="stream"                            value="" />
+            <param name="general/zed_id"                    value="1" />
+            <param name="general/gpu_id"                    value="-1" />
+            <param name="general/serial_number"             value="29520794" />
+        </node>
+
         <node name="master_discovery" pkg="fkie_master_discovery" type="master_discovery" output="$(arg output)">
             <rosparam command="load" file="$(find camel_robot)/config/bringup/master_disc_config.yaml"/>
         </node>
-
 
         <node name="master_sync" pkg="fkie_master_sync" type="master_sync" output="$(arg output)">
             <rosparam command="load" file="$(find camel_robot)/config/bringup/master_sync_config.yaml"/>
         </node>
         
-        
-        <!-- Rosbridge Websocket -->
+
         <node name="rosbridge_websocket" pkg="rosbridge_server" type="rosbridge_websocket" output="$(arg output)">
             <rosparam command="load" file="$(find camel_robot)/config/bringup/rosbridge_ws_config.yaml"/>
             <param name="port" value="$(arg ws_port)"/>
-            <param name="address" value="$(env ROS_HOSTNAME)"/>
+            <param name="address" value="$(env HOSTNAME)"/>
             <rosparam command="load" file="$(find camel_robot)/config/bringup/rosbridge_glob_config.yaml"/>
         </node>
 
         <node name="rosapi" pkg="rosapi" type="rosapi_node" output="$(arg output)">
             <rosparam command="load" file="$(find camel_robot)/config/bringup/rosbridge_glob_config.yaml"/>
-        </node>
+        </node> -->
+
+        <node pkg="camel_robot" name="hook_controller" type="hooks_control.py" output="$(arg output)"  required='true'>
+            <rosparam command="load" file="$(find camel_robot)/config/bringup/hook_control_config.yaml"/>
+         </node>
 
     </group>
 </launch>
