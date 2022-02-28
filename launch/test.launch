@@ -2,8 +2,8 @@
 <launch>
     <arg name="front_lidar_ip"        default="192.168.1.3" />
     <arg name="back_lidar_ip"         default="192.168.1.4" />
-    <arg name="common_modbus_ip"      default="192.168.1.110" />
-    <arg name="lights_modbus_ip"      default="192.168.1.111" />
+    <arg name="common_modbus_ip"      default="192.168.1.112" />
+    <arg name="lights_modbus_ip"      default="192.168.1.110" />
     <arg name="robot_name"            default="$(env ROBOT_NAME)" />
     <arg name="base_frame"            default="base_link" />
     <arg name="output"                default="screen" />
@@ -12,7 +12,7 @@
     <group ns="$(arg robot_name)">
 
        
-        <!-- <param name="use_gui" value="false" />
+        <param name="use_gui" value="false" />
         <param name="robot_description" command="$(find xacro)/xacro '$(find camel_urdf)/urdf/CAMEL-1000.urdf.xacro'  robot_model:=$(arg robot_name)
         base_frame:=$(arg base_frame)"/>
 
@@ -77,11 +77,11 @@
         
 
 
-        <node pkg="ethernet_remote_io_module" name="remote_io" type="modbus_node.py" output="$(arg output)" ns="common" required='true'>
+        <!-- <node pkg="ethernet_remote_io_module" name="remote_io" type="modbus_node.py" output="$(arg output)" ns="common" required='true'>
             <param name="ip_address" value="$(arg common_modbus_ip)"/>
             <param name="port" value="502"/>
             <param name="rate" value="10"/>
-        </node>
+        </node> -->
 
 
         <node pkg="ethernet_remote_io_module" name="remote_io" type="modbus_node.py" output="$(arg output)" ns="ligths" required='true'>
@@ -172,11 +172,17 @@
 
         <node name="rosapi" pkg="rosapi" type="rosapi_node" output="$(arg output)">
             <rosparam command="load" file="$(find camel_robot)/config/bringup/rosbridge_glob_config.yaml"/>
-        </node> -->
+        </node>
 
-        <node pkg="camel_robot" name="hook_controller" type="hooks_control.py" output="$(arg output)"  required='true'>
+        <!-- <node pkg="ethernet_remote_io_module" name="remote_io" type="service.py" output="$(arg output)" ns="common" required='true'>
+            <param name="ip_address" value="$(arg common_modbus_ip)"/>
+            <param name="port" value="502"/>
+            <param name="rate" value="10"/>
+        </node>
+
+        <node pkg="camel_robot" name="hook_controller" type="hooks_control.py" output="$(arg output)"  required='true' ns="common" >
             <rosparam command="load" file="$(find camel_robot)/config/bringup/hook_control_config.yaml"/>
-         </node>
+         </node> -->
 
     </group>
 </launch>
