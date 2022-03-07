@@ -18,6 +18,7 @@
         </node>
 
     </group> -->
-    <node pkg="camel_robot" name="modbus" type="modbus.py" output="screen"  required='true' />
-    <node pkg="camel_robot" name="hooks" type="hook_ctrl.py" output="screen"  required='true' />
+    <node pkg="camel_robot" name="modbus" type="modbus.py" output="screen"  required='true' ns="common"/>
+    <node pkg="camel_robot" name="hooks" type="hook_cntrl.py" output="screen"  required='true' ns="common"/>
+    <node pkg="camel_robot" name="test_hook" type="test_hook.py" output="screen"  required='true' ns="common"/>
 </launch>

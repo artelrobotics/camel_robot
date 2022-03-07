@@ -21,19 +21,15 @@ def shutdown_hook() -> None:
         pass
 
 def write_coil(msg: WriteCoil) -> None:
-    start_time = time.time()
     address = msg.address
     value = msg.value
     client.write_coil(address=address, value= value, unit=0x01)
-    rospy.loginfo(f"{time.time() - start_time}")
 
 def write_coils(msg: WriteCoils) -> None:
-    start_time = time.time()
     start_address = msg.address
     end_address = msg.last
     value = msg.value
     client.write_coils(address=start_address, values=[value]*end_address, unit=0x01)
-    rospy.loginfo(f"{time.time() - start_time}")
     
 def read_inputs() -> None:
     while not rospy.is_shutdown():

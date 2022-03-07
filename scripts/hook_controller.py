@@ -46,6 +46,7 @@ class Hook:
             else:
                 self.coil_value = False
                 self.write()
+                
             self.success = True
             return SetBoolResponse(self.success, "HOOK IS UP")
 
@@ -56,6 +57,7 @@ class Hook:
             else:
                 self.coil_value = False
                 self.write()
+
             self.success = True
             return SetBoolResponse(self.success, "HOOK IS DOWN")
 

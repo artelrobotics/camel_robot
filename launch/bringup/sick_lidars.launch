@@ -47,17 +47,17 @@
 
     <!-- Two lidars merger -->
         
-    <node pkg="ira_laser_tools" name="laserscan_multi_merger" type="laserscan_multi_merger" output="$(arg output)">
-        <param name="destination_frame" value="$(arg robot_name)/laser"/>
+    <node pkg="ira_laser_tools" name="scan_merger" type="laserscan_multi_merger" output="$(arg output)">
+        <param name="destination_frame" value="$(arg robot_name)/base_link"/>
         <param name="cloud_destination_topic" value="/$(arg robot_name)/merged_cloud"/>
         <param name="scan_destination_topic" value="/$(arg robot_name)/scan"/>
         <param name="laserscan_topics" value ="/$(arg robot_name)/front_lidar/scan /$(arg robot_name)/back_lidar/scan" /> 
-        <param name="angle_min" value="-2.35619449615"/>
-        <param name="angle_max" value="2.35619449615"/>
+        <param name="angle_min" value="-3.14159265359"/>
+        <param name="angle_max" value="3.14159265359"/>
         <param name="angle_increment" value="0.00872664619237"/>
-        <param name="scan_time" value="0.0333333"/>
-        <param name="range_min" value="0.30"/>
-        <param name="range_max" value="50.0"/>
+        <param name="scan_time" value="0.019999999552965164"/>
+        <param name="range_min" value="0.05"/>
+        <param name="range_max" value="25.0"/>
     </node>
 
 </launch>
