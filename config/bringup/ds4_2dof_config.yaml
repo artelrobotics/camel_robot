@@ -1,0 +1,6 @@
+inputs:
+  linear:
+    x: axis_left_y
+  angular:
+    z: axis_right_x
+

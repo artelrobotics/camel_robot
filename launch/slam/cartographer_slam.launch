@@ -4,23 +4,21 @@
     <arg name="base_frame"            default="base_link" />
     <arg name="output"                default="screen" />
 
-    <launch>
-        <!-- Run Cartographer Node -->
-        <node name="cartographer_node" pkg="cartographer_ros"
-            type="cartographer_node" args="
-                -configuration_directory
-                    $(find camel_robot)/config/slam
-                -configuration_basename cartographer_config.lua"
-            output="$(arg screen)">
-          <remap from="scan_1" to="/$(arg robot_name)/front_lidar/scan" />
-          <remap from="scan_2" to="/$(arg robot_name)/back_lidar/scan" />
-          <remap from="odom" to="/$(arg robot_name)/odometry" />
-        </node>
-      
-        <node name="cartographer_occupancy_grid_node" pkg="cartographer_ros"
-            type="cartographer_occupancy_grid_node" args="-resolution 0.05" />
+    <!-- Run Cartographer Node -->
+    <node name="cartographer_node" pkg="cartographer_ros"
+        type="cartographer_node" args="
+            -configuration_directory
+                $(find camel_robot)/config/slam
+            -configuration_basename cartographer_config.lua"
+        output="$(arg output)">
+        <remap from="scan_1" to="/$(arg robot_name)/front_lidar/scan" />
+        <remap from="scan_2" to="/$(arg robot_name)/back_lidar/scan" />
+        <remap from="odom" to="/$(arg robot_name)/odometry" />
+    </node>
+    
+    <node name="cartographer_occupancy_grid_node" pkg="cartographer_ros"
+        type="cartographer_occupancy_grid_node" args="-resolution 0.05" />
 
       
-      </launch>
 
 </launch>

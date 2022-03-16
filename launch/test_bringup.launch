@@ -93,32 +93,15 @@
         <param name="rate" value="10"/>
     </node> -->
 
-    <!-- IMU Sensor-->
-    <!-- <node pkg="razor_imu_9dof" type="imu_node.py" name="imu_node" output="$(arg output)" required='true'>
-        <rosparam file="$(find camel_robot)/config/bringup/razor_imu_config.yaml" command="load"/>
-        <param name="port"       value="/dev/ttyIMU"/>
-        <param name="frame_id"   value="$(arg robot_name)/imu"/>
-        <remap from="/$(arg robot_name)/imu" to="/$(arg robot_name)/imu/data_raw"/>
-    </node>
-
-    <node pkg="imu_complementary_filter" type="complementary_filter_node" name="complementary_filter" output="$(arg output)" required='true'>
-        <param name="do_bias_estimation" value="true"/>
-        <param name="do_adaptive_gain"   value="true"/>
-        <param name="use_mag"            value="false"/>
-        <param name="gain_acc"           value="0.01"/>
-        <param name="gain_mag"           value="0.01"/>
-        <param name="fixed_frame"        value="$(arg robot_name)/base_link"/>
-        <param name="publish_tf"         value="$(arg pub_tf)"/> 
-    </node> -->
-
+    
     <!-- Roboteq drivers -->
     <!-- bms -->
-    <!--<node name="bms"  pkg="roboteq_bms" type="roboteq_bms.py"  output="$(arg output)"  required='true'>
+    <node name="bms"  pkg="roboteq_bms" type="roboteq_bms.py"  output="$(arg output)"  required='true'>
         <param name="port"         value="/dev/RoboteqBMS"/>
         <param name="baud"         value="115200"/>
         <param name="desired_freq" value="5"/>
     </node>
-    -->
+   
     <!-- motor driver -->
     <node name = "driver" pkg = "roboteq_motor_controller_driver" type = "roboteq_motor_controller_driver_node" output="$(arg output)" required='true'>
         <rosparam command="load" file="$(find camel_robot)/config/bringup/motor_driver_config.yaml" />
@@ -148,11 +131,12 @@
         <param name="stream"                            value="" />
         <param name="general/zed_id"                    value="0" />
         <param name="general/gpu_id"                    value="-1" />
-        <param name="general/serial_number"             value="28998504" />
+        <param name="general/serial_number"             value="21229143" />
         <param name="pos_tracking/odometry_frame"       value="$(arg robot_name)/odom"/>
     </node>
 
-    <!-- <node name="zed" pkg="zed_wrapper" type="zed_wrapper_node" output="$(arg output)" ns="back" required="true">
+    <!-- Back ZED2 -->
+    <node name="zed" pkg="zed_wrapper" type="zed_wrapper_node" output="$(arg output)" ns="back" required="true">
         <rosparam file="$(find camel_robot)/config/bringup/zed2_back_config.yaml" command="load" />
         <rosparam file="$(find camel_robot)/config/bringup/zed2_common_config.yaml" command="load" />
         <param name="general/camera_name"               value="$(arg robot_name)/zed_back" />
@@ -162,15 +146,53 @@
         <param name="general/zed_id"                    value="1" />
         <param name="general/gpu_id"                    value="-1" />
         <param name="general/serial_number"             value="29520794" />
-    </node> -->
+    </node>
+
+    <node pkg="robot_localization" type="ekf_localization_node" name="ekf_se" clear_params="true" output="$(arg output)">
+        <rosparam command="load" file="$(find camel_robot)/config/slam/ekf_localization_config.yaml" />
+
+        <param name="odom_frame" value="$(arg robot_name)/odom"/>
+        <param name="base_link_frame" value="$(arg robot_name)/$(arg base_frame)"/>
+        <param name="world_frame" value="$(arg robot_name)/odom"/>
+
+        <param name="odom0" value="/$(arg robot_name)/encoder/odom"/> 
+        <param name="odom0_queue_size" value="2"/>
+
+        <param name="imu0" value="/$(arg robot_name)/front/zed/imu/data"/> 
+        <param name="imu0_queue_size" value="5"/>
+    
+        <remap from="/$(arg robot_name)/odometry/filtered" to="/$(arg robot_name)/odometry"/>
+        <remap from="/$(arg robot_name)/accel/filtered" to="/$(arg robot_name)/accel"/>
+
+    </node>
 
 
-    <!-- TODO -->
-    <!-- Placeholder for Hooks -->
+    <!-- Hooks Control-->
     <node pkg="camel_robot" name="hook" type="hook_cntrl.py" output="$(arg output)"  required='true' ns="common"/>
 
+    <!-- Light Control-->
+    <node pkg="camel_robot" name="light_control" type="Light_control.py" output="$(arg output)"  required='true' ns="common"/>
+    
+    <!-- Light Service-->   
+    <node pkg="camel_robot" name="light_service" type="Light_service.py" output="$(arg output)"  required='true' ns="common"/>
 
+    <!-- Robot Status-->
+    <node pkg="camel_robot" name="robot_status" type="robot_status.py" output="$(arg output)"  required='true'/>
+    
+    <!-- TODO -->
     <!-- Placeholder for Lights -->
+
+    <!-- DualShock4 -->
+    <node pkg="ds4_driver" type="ds4_driver_node.py" name="ds4_driver" output="screen" >
+        <param name="backend" value="bluetooth" />
+        <param name="device_addr" value="" />
+        <param name="use_standard_msgs" value="false"/>
+    </node>
+    <node pkg="ds4_driver" type="ds4_twist_node.py" name="ds4_twist" output="screen" >
+        <rosparam command="load" file="$(find camel_robot)/config/bringup/ds4_2dof_config.yaml" />
+        <param name="stamped" value="false" />
+        <remap from="/$(arg robot_name)/cmd_vel" to="/$(arg robot_name)/driver/cmd_vel"/>
+    </node>
 
 
 
@@ -197,22 +219,6 @@
     <node name="rosapi" pkg="rosapi" type="rosapi_node" output="$(arg output)">
         <rosparam command="load" file="$(find camel_robot)/config/bringup/rosbridge_glob_config.yaml"/>
     </node> -->
-    <node pkg="robot_localization" type="ekf_localization_node" name="ekf_se" clear_params="true" output="$(arg output)">
-        <rosparam command="load" file="$(find camel_robot)/config/slam/ekf_localization_config.yaml" />
-
-        <param name="odom_frame" value="$(arg robot_name)/odom"/>
-        <param name="base_link_frame" value="$(arg robot_name)/$(arg base_frame)"/>
-        <param name="world_frame" value="$(arg robot_name)/odom"/>
-
-        <param name="odom0" value="/$(arg robot_name)/encoder/odom"/> 
-        <param name="odom0_queue_size" value="2"/>
-
-        <param name="imu0" value="/$(arg robot_name)/front/zed/imu/data"/> 
-        <param name="imu0_queue_size" value="5"/>
     
-        <remap from="/$(arg robot_name)/odometry/filtered" to="/$(arg robot_name)/odometry"/>
-        <remap from="/$(arg robot_name)/accel/filtered" to="/$(arg robot_name)/accel"/>
-
-    </node>
     
 </launch>

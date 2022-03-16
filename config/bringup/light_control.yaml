@@ -1,0 +1,4 @@
+read_digital_inputs: "/camel_amr_1000_001/ligths/read_digital_inputs"
+write_coil: "/camel_amr_1000_001/common/write_coil"
+write_coils: "/camel_amr_1000_001/common/write_coils"
+#write_coils_list: "/camel_amr_1000_001/common/write_coils_"

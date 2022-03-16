@@ -14,7 +14,7 @@
         <param name="stream"                            value="" />
         <param name="general/zed_id"                    value="0" />
         <param name="general/gpu_id"                    value="-1" />
-        <param name="general/serial_number"             value="28998504" />
+        <param name="general/serial_number"             value="21229143" />
     </node>
 
     <node name="zed2" pkg="zed_wrapper" type="zed_wrapper_node" output="$(arg output)" ns="back" required="true">

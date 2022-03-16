@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 import re
 import rospy
-from ethernet_remote_io_module.msg import WriteCoil, ReadDigitalInputs, WriteCoils
+from ethernet_remote_io_module.msg import WriteCoil, ReadDigitalInputs, WriteCoilsList
 from pymodbus.client.sync import ModbusTcpClient
 from rospy import loginfo, logerr, logwarn, loginfo_once
 import threading
@@ -25,20 +25,23 @@ def write_coil(msg: WriteCoil) -> None:
     value = msg.value
     client.write_coil(address=address, value= value, unit=0x01)
 
-def write_coils(msg: WriteCoils) -> None:
-    start_address = msg.address
-    end_address = msg.last
+def write_coils(msg: WriteCoilsList) -> None:
     value = msg.value
-    client.write_coils(address=start_address, values=[value]*end_address, unit=0x01)
+    address = 2
+    client.write_coils(address=address, values=value, unit=1)
     
 def read_inputs() -> None:
     while not rospy.is_shutdown():
         pub_msg = ReadDigitalInputs()
-        res = client.read_discrete_inputs(address=0, count=8, unit=0x01)
-        pub_msg.all_inputs = res.bits
-        pub.publish(pub_msg)
-        rate.sleep()
+        try:
+            res = client.read_discrete_inputs(address=0, count=8, unit=0x01)
+            pub_msg.all_inputs = res.bits
+            pub.publish(pub_msg)
+            rate.sleep()
+        except Exception as e:
+            rospy.logerr(e)
 
+        
 
 if __name__ == "__main__":
     rospy.init_node('write_coil', anonymous=True, disable_signals=True)
@@ -59,7 +62,7 @@ if __name__ == "__main__":
             loginfo('Connection Success')
             rate = rospy.Rate(10)
             rospy.Subscriber("write_coil", WriteCoil, callback=write_coil, queue_size=1)
-            rospy.Subscriber("write_coils", WriteCoils, callback=write_coils, queue_size=1)
+            rospy.Subscriber("write_coils", WriteCoilsList, callback=write_coils, queue_size=1)
             pub = rospy.Publisher("read_inputs", ReadDigitalInputs, queue_size=1)
             thread = threading.Thread(target=read_inputs)
             thread.start()

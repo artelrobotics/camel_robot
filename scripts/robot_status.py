@@ -2,7 +2,8 @@
 from numpy import append
 import rospy
 from std_msgs.msg import String
-from camel_robot.msg import RobotStatus
+from robotnik_msgs.msg import BatteryStatus
+from camel_robot.msg import RobotStatus, DriverStatus, BmsStatus
 from actionlib_msgs.msg import GoalStatusArray
 from roboteq_motor_controller_driver.msg import channel_values
 
@@ -36,8 +37,8 @@ def fault_flags_callback(value):
     else:
         status = check_states(status_naming, state=value.value[0])
     #rospy.loginfo(status)
-    status_pub.publish(status)
-
+    robot_status.driver_status.fault_flag = status
+    status_pub.publish(robot_status)
 def status_flags_callback(value):
     """
         [Callback function of Status flags topic]
@@ -57,11 +58,11 @@ def status_flags_callback(value):
         status_right = check_states(status_naming_right, state=value.value[1])
     
     #rospy.loginfo(status_left)
-    status_pub.publish(status_left)
+    robot_status.driver_status.status_flag_left = status_left
+    robot_status.driver_status.status_flag_right = status_right
+    status_pub.publish(robot_status)
     #rospy.loginfo(status_right)
-    status_pub.publish(status_right)
-
-
+    
 def bms_status_flags_callback(data):
     """
         [Callback function of Fault flag topic]
@@ -69,14 +70,49 @@ def bms_status_flags_callback(data):
             data(str):fault_flag_number(2^(n-1))
         Publishes Name of fault to topic 'robot_status' 
     """
-    status_naming = ["roboteq_bms/Unsafe Temperature", "roboteq_bms/Over or Under Voltage Error Set", "roboteq_bms/Amp Trigger Set", "roboteq_bms/Over Current Error set", "roboteq_bms/Short Load or Inv Charger", "roboteq_bms/Bad State of Health", "roboteq_bms/Config Error", "roboteq_bms/Internal Fault"]
+    status_naming = ["roboteq_bms/Trigger Load", "roboteq_bms/Trigger Charge", "roboteq_bms/Cell Over Volt", 
+                    "roboteq_bms/Cell Under Volt", "roboteq_bms/Unsafe Temperature", "roboteq_bms/Bad State of Health",
+                     "roboteq_bms/Balancing", "roboteq_bms/RunScript"]
     #print(data.data)
     if(int(data.data) == 0):
         status = ["BMS_Status_flag/Normal"]
     else:
         status = check_states(status_naming, state=int(data.data))    
     #rospy.loginfo(status)
-    status_pub.publish(status)
+    robot_status.bms_status.status_flag = status
+    status_pub.publish(robot_status)
+
+def bms_fault_flags_callback(data):
+    """
+        [Callback function of Fault flag topic]
+        Arg:
+            data(str):fault_flag_number(2^(n-1))
+        Publishes Name of fault to topic 'robot_status' 
+    """
+    status_naming = ["roboteq_bms/OC Load", "roboteq_bms/Short Load", "roboteq_bms/OC Charger",
+                     "roboteq_bms/Inverse Charger", "roboteq_bms/OC Pack In", "roboteq_bms/OC Pack Out", 
+                     "roboteq_bms/Internal Fault", "roboteq_bms/Config Error"]
+
+    
+    if(int(data.data) == 0):
+        status = ["BMS_Status_flag/Normal"]
+    else:
+        status = check_states(status_naming, state=int(data.data))    
+    #rospy.loginfo(status)
+    robot_status.bms_status.fault_flag = status
+    status_pub.publish(robot_status)
+
+def bms_data_callback(data):
+    if data.min_cell > 3.4:
+        robot_status.bms_status.battery = "High level"
+    elif data.min_cell < 3.4 and data.min_cell >= 3:
+        robot_status.bms_status.battery = "Medium level" 
+    elif data.min_cell < 3 and data.min_cell > 2.9:
+        robot_status.bms_status.battery = "Low level"
+    elif data.min_cell <= 2.9:
+        robot_status.bms_status.battery = "Critical level"    
+    robot_status.bms_status.charging = data.is_charging
+    status_pub.publish(robot_status)
 
 def move_base_status_callback(msg):
     """
@@ -108,15 +144,16 @@ def listener():
     """
         Initialize node and Subscribes topics
     """
-    global status_pub
-
-    rospy.init_node('Driver_status', anonymous=True)
-    
-    status_pub = rospy.Publisher(rospy.get_param('~robot_status'), RobotStatus, queue_size=10)   
-    rospy.Subscriber(rospy.get_param('~driver_fault_flag'), channel_values, fault_flags_callback)
-    rospy.Subscriber(rospy.get_param('~driver_status_flag'), channel_values, status_flags_callback)
-    rospy.Subscriber(rospy.get_param('~bms_status_flag'), String, bms_status_flags_callback)
-    rospy.Subscriber(rospy.get_param('~move_base_status'), GoalStatusArray, move_base_status_callback)
+    global status_pub, robot_status 
+    robot_status = RobotStatus()
+    rospy.init_node('Robot_status', anonymous=True)
+    status_pub = rospy.Publisher('robot_status', RobotStatus, queue_size=10)   
+    rospy.Subscriber('driver/fault_flag', channel_values, fault_flags_callback)
+    rospy.Subscriber('driver/status_flag', channel_values, status_flags_callback)
+    rospy.Subscriber('bms/status_flags', String, bms_status_flags_callback)
+    rospy.Subscriber('bms/fault_flags', String, bms_fault_flags_callback)
+    rospy.Subscriber('bms/data', BatteryStatus, bms_data_callback)
+    #rospy.Subscriber('move_base_status', GoalStatusArray, move_base_status_callback)
     rospy.spin()
    
 if __name__ == '__main__':

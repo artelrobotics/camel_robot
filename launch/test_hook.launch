@@ -1,24 +1,12 @@
 <?xml version="1.0"?>
 <launch>
-    <!-- <arg name="front_lidar_ip"        default="192.168.1.3" />
-    <arg name="back_lidar_ip"         default="192.168.1.4" />
     <arg name="common_modbus_ip"      default="192.168.1.111" />
-    <arg name="lights_modbus_ip"      default="192.168.1.110" />
-    <arg name="robot_name"            default="$(env ROBOT_NAME)" />
-    <arg name="base_frame"            default="base_link" />
-    <arg name="output"                default="screen" />
-    <arg name="ws_port"                default="9090"/>
-
-    <group ns="$(arg robot_name)">
-         <node pkg="camel_robot" name="modbus" type="modbus.py" output="$(arg output)"  required='true' ns="common" >
-            
-        </node>
-        <node pkg="camel_robot" name="hook_controller" type="hook_controller.py" output="$(arg output)"  required='true' ns="common" >
-            <rosparam command="load" file="$(find camel_robot)/config/bringup/hook_control_config.yaml"/>
-        </node>
-
-    </group> -->
-    <node pkg="camel_robot" name="modbus" type="modbus.py" output="screen"  required='true' ns="common"/>
-    <node pkg="camel_robot" name="hooks" type="hook_cntrl.py" output="screen"  required='true' ns="common"/>
-    <node pkg="camel_robot" name="test_hook" type="test_hook.py" output="screen"  required='true' ns="common"/>
+    <node pkg="camel_robot" name="modbus" type="modbus.py" output="screen" ns="common" required='true'>
+        <param name="ip_address" value="$(arg common_modbus_ip)"/>
+        <param name="port" value="502"/>
+        <param name="rate" value="10"/>
+    </node> 
+    <node pkg="camel_robot" name="hook" type="hook_cntrl.py" output="screen"  required='true' ns="common"/>
+    <node pkg="camel_robot" name="light_control" type="Light_control.py" output="screen"  required='true' ns="common"/>
+    <node pkg="camel_robot" name="light_service" type="Light_service.py" output="screen"  required='true' ns="common"/>
 </launch>

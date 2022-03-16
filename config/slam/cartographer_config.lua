@@ -1,13 +1,15 @@
 include "map_builder.lua"
 include "trajectory_builder.lua"
 
+robot_name = os.getenv("ROBOT_NAME")
+
 options = {
   map_builder = MAP_BUILDER,
   trajectory_builder = TRAJECTORY_BUILDER,
-  map_frame = "map",
-  tracking_frame = "imu",
-  published_frame = "odom",
-  odom_frame = "odom",
+  map_frame = robot_name.."/map",
+  tracking_frame = robot_name.."/base_link",
+  published_frame = robot_name.."/odom",
+  odom_frame = robot_name.."/odom",
   provide_odom_frame = false,
   publish_frame_projected_to_2d = false,
   use_odometry = true,
@@ -56,7 +58,7 @@ POSE_GRAPH.global_constraint_search_after_n_seconds = 30 -- Increase
 ---------Global/Local SLAM---------
 TRAJECTORY_BUILDER_2D.adaptive_voxel_filter.min_num_points = 100 -- Decrease
 TRAJECTORY_BUILDER_2D.submaps.num_range_data = 100 -- Decrease
-TRAJECTORY_BUILDER_2D.max_range = 10. -- Decrease
+TRAJECTORY_BUILDER_2D.max_range = 20. -- Decrease
 
 -------------------------------------------------------------------------------------
 
