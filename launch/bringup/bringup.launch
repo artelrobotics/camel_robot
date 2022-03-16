@@ -2,13 +2,11 @@
 <launch>
     <arg name="front_lidar_ip"        default="192.168.1.3" />
     <arg name="back_lidar_ip"         default="192.168.1.4" />
-    <arg name="common_modbus_ip"      default="192.168.1.110" />
-    <arg name="lights_modbus_ip"      default="192.168.1.111" />
+    <arg name="common_modbus_ip"      default="192.168.1.111" />
     <arg name="robot_name"            default="$(env ROBOT_NAME)" />
     <arg name="base_frame"            default="base_link" />
     <arg name="output"                default="screen" />
     <arg name="ws_port"               default="9090"/>
-
 
 
     <!-- Robot Description -->
@@ -40,38 +38,12 @@
         <param name="rate" value="10"/>
     </node> 
 
-    <!-- for lights  -->
-    <node pkg="ethernet_remote_io_module" name="remote_io" type="modbus_node.py" output="$(arg output)" ns="ligths" required='true'>
-        <param name="ip_address" value="$(arg lights_modbus_ip)"/>
-        <param name="port" value="502"/>
-        <param name="rate" value="10"/>
-    </node>
-
     <!-- Roboteq drivers -->
-    <!-- bms -->
-    <node name="roboteq_bms"  pkg="roboteq_bms" type="roboteq_bms.py"  output="$(arg output)" respawn="true" respawn_delay="10" required='true'>
-        <param name="port"         value="/dev/RoboteqBMS"/>
-        <param name="baud"         value="115200"/>
-        <param name="desired_freq" value="5"/>
-    </node>
-
-    <!-- motor driver -->
-    <node name = "roboteq_driver" pkg = "roboteq_motor_controller_driver" type = "roboteq_motor_controller_driver_node" output="$(arg output)" required='true'>
-        <rosparam command="load" file="$(find camel_robot)/config/bringup/motor_driver_config.yaml" />
-        <param name="port"  value="/dev/RoboteqDriver"/>
-        <param name="baud"  value="115200"/>
-    </node>
-
-    <!-- encoder odometry -->
-    <node name = "diff_odom" pkg = "roboteq_motor_controller_driver" type = "diff_odom" output="$(arg output)" required='true'>
-        <rosparam command="load" file="$(find camel_robot)/config/bringup/odom_encoder_config.yaml" />
-        <param name="base_frame"            value="$(arg robot_name)/base_link"/>
-        <param name="odom_frame"            value="$(arg robot_name)/odom"/>
-        <parapm name="encoder_topic_name"   value="/$(arg robot_name)/roboteq_driver/encoder_count" />
-        <parapm name="command_srv"          value="/$(arg robot_name)/roboteq_driver/dualchannel_command_service" />
-        <parapm name="publish_tf"           value="false" />
-        <remap from="/$(arg robot_name)/diff_odom/odom"  to="/$(arg robot_name)/roboteq/odom"/>
-    </node>
+    <include file="$(find camel_robot)/launch/bringup/drivers.launch">
+        <arg name="robot_name"            value="$(env ROBOT_NAME)" />
+        <arg name="base_frame"            value="$(arg base_frame)" />
+        <arg name="output"                value="$(arg output)" />
+    </include>
 
 
     <!-- ZED Cameras -->
@@ -102,12 +74,17 @@
     </node>
 
 
-
-    <!-- TODO -->
-    <!-- Placeholder for Hooks -->
+    <!-- Hooks Control-->
     <node pkg="camel_robot" name="hook" type="hook_cntrl.py" output="$(arg output)"  required='true' ns="common"/>
 
-    <!-- Placeholder for Lights -->
+    <!-- Light Control-->
+    <node pkg="camel_robot" name="light_control" type="Light_control.py" output="$(arg output)"  required='true' ns="common"/>
+    
+    <!-- Light Service-->   
+    <node pkg="camel_robot" name="light_service" type="Light_service.py" output="$(arg output)"  required='true' ns="common"/>
+
+    <!-- Robot Status-->
+    <node pkg="camel_robot" name="robot_status" type="robot_status.py" output="$(arg output)"  required='true'/>
 
 
 

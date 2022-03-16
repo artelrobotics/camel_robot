@@ -134,7 +134,9 @@ def move_base_status_callback(msg):
     status_msg = GoalStatusArray()
     status_msg = msg
     status = []
-    status_naming_list = ["Move_base/PENDING", "Move_base/ACTIVE", "Move_base/PREEMPTED", "Move_base/SUCCEEDED", "Move_base/ABORTED", "Move_base/REJECTED", "Move_base/PREEMPTING", "Move_base/RECALLING", "Move_base/RECALLED", "Move_base/LOST"]
+    status_naming_list = ["Move_base/PENDING", "Move_base/ACTIVE", "Move_base/PREEMPTED", "Move_base/SUCCEEDED",
+                         "Move_base/ABORTED", "Move_base/REJECTED", "Move_base/PREEMPTING", "Move_base/RECALLING", 
+                         "Move_base/RECALLED", "Move_base/LOST"]
     status_index = status_msg.status_list[0].status
     status.append(status_naming_list[status_index])
     #rospy.loginfo(status)

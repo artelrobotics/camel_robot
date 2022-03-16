@@ -7,6 +7,7 @@
         <param name="rate" value="10"/>
     </node> 
     <node pkg="camel_robot" name="hook" type="hook_cntrl.py" output="screen"  required='true' ns="common"/>
+    <!-- <node pkg="camel_robot" name="test" type="test_hook.py" output="screen"  required='true' ns="common"/> -->
     <node pkg="camel_robot" name="light_control" type="Light_control.py" output="screen"  required='true' ns="common"/>
     <node pkg="camel_robot" name="light_service" type="Light_service.py" output="screen"  required='true' ns="common"/>
 </launch>

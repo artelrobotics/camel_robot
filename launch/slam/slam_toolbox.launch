@@ -1,0 +1,40 @@
+<?xml version="1.0"?>
+<launch>
+    <arg name="robot_name"  default="$(env ROBOT_NAME)" />
+    <arg name="type"        default="sync" doc="types: sync, async, lifelong"/>
+    <arg name="base_frame"  default="base_link" />
+    <arg name="output"      default="screen" />
+
+    <group if="$(eval type == async)">
+        <node pkg="slam_toolbox" type="async_slam_toolbox_node" name="slam_toolbox" output="$(arg output)">
+            <rosparam command="load" file="$(find camel_robot)/config/slam/st_online_config.yaml" />
+            <param name="odom_frame" value="$(arg robot_name)/odom"/>
+            <param name="map_frame" value="$(arg robot_name)/map"/>
+            <param name="base_frame" value="$(arg robot_name)/$(arg base_frame)"/>
+            <param name="scan_topic" value="/$(arg robot_name)/scan"/>
+            <param name="map_name" value="/$(arg robot_name)/map"/>
+        </node>
+    </group>
+
+    <group if="$(eval type == sync)">
+        <node pkg="slam_toolbox" type="sync_slam_toolbox_node" name="slam_toolbox" output="$(arg output)">
+            <rosparam command="load" file="$(find camel_robot)/config/slam/st_online_config.yaml" />
+            <param name="odom_frame" value="$(arg robot_name)/odom"/>
+            <param name="map_frame" value="$(arg robot_name)/map"/>
+            <param name="base_frame" value="$(arg robot_name)/$(arg base_frame)"/>
+            <param name="scan_topic" value="/$(arg robot_name)/scan"/>
+            <param name="map_name" value="/$(arg robot_name)/map"/>
+        </node>
+    </group>
+
+    <group if="$(eval type == lifelong)">
+        <node pkg="slam_toolbox" type="lifelong_slam_toolbox_node" name="slam_toolbox" output="$(arg output)">
+            <rosparam command="load" file="$(find camel_robot)/config/slam/st_lifelong_config.yaml" />
+            <param name="odom_frame" value="$(arg robot_name)/odom"/>
+            <param name="map_frame" value="$(arg robot_name)/map"/>
+            <param name="base_frame" value="$(arg robot_name)/$(arg base_frame)"/>
+            <param name="scan_topic" value="/$(arg robot_name)/scan"/>
+            <param name="map_name" value="/$(arg robot_name)/map"/>
+        </node>
+    </group>
+</launch>

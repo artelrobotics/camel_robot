@@ -3,7 +3,6 @@
     <arg name="front_lidar_ip"        default="192.168.1.3" />
     <arg name="back_lidar_ip"         default="192.168.1.4" />
     <arg name="common_modbus_ip"      default="192.168.1.111" />
-    <arg name="lights_modbus_ip"      default="192.168.1.110" />
     <arg name="robot_name"            default="$(env ROBOT_NAME)" />
     <arg name="base_frame"            default="base_link" />
     <arg name="output"                default="screen" />
@@ -85,21 +84,13 @@
         <param name="port" value="502"/>
         <param name="rate" value="10"/>
     </node> 
-
-    <!-- for lights  -->
-    <!-- <node pkg="ethernet_remote_io_module" name="modbus" type="modbus_node.py" output="$(arg output)" ns="ligths" required='true'>
-        <param name="ip_address" value="$(arg lights_modbus_ip)"/>
-        <param name="port" value="502"/>
-        <param name="rate" value="10"/>
-    </node> -->
-
     
     <!-- Roboteq drivers -->
     <!-- bms -->
     <node name="bms"  pkg="roboteq_bms" type="roboteq_bms.py"  output="$(arg output)"  required='true'>
         <param name="port"         value="/dev/RoboteqBMS"/>
         <param name="baud"         value="115200"/>
-        <param name="desired_freq" value="5"/>
+        <param name="desired_freq" value="2"/>
     </node>
    
     <!-- motor driver -->
@@ -178,9 +169,7 @@
 
     <!-- Robot Status-->
     <node pkg="camel_robot" name="robot_status" type="robot_status.py" output="$(arg output)"  required='true'/>
-    
-    <!-- TODO -->
-    <!-- Placeholder for Lights -->
+
 
     <!-- DualShock4 -->
     <node pkg="ds4_driver" type="ds4_driver_node.py" name="ds4_driver" output="screen" >

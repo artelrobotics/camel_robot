@@ -22,8 +22,18 @@
         <param name="baud"  value="115200"/>
     </node>
 
+    <node name = "encoder" pkg = "roboteq_motor_controller_driver" type = "diff_odom" output="$(arg output)" required='true'>
+        <rosparam command="load" file="$(find camel_robot)/config/bringup/odom_encoder_config.yaml" />
+        <param name="base_frame"            value="$(arg robot_name)/base_link"/>
+        <param name="odom_frame"            value="$(arg robot_name)/odom"/>
+        <param name="encoder_topic_name"   value="/$(arg robot_name)/driver/encoder_count" />
+        <param name="command_srv"          value="/$(arg robot_name)/driver/dualchannel_command_service" />
+        <param name="publish_tf"           value="false" /> <!-- Debug only -->
+    </node>
+
+
     <!-- DualShock4 -->
-    <node pkg="ds4_driver" type="ds4_driver_node.py" name="ds4_driver" output="screen" >
+    <node pkg="ds4_driver" type="ds4_driver_node.py" name="ds4_joystick" output="screen" >
         <param name="backend" value="bluetooth" />
         <param name="device_addr" value="" />
         <param name="use_standard_msgs" value="false"/>
