@@ -60,6 +60,8 @@ add_message_files(
  add_service_files(
    FILES
    light.srv
+   pose_save.srv
+   sound.srv
  )
 
 ## Generate actions in the 'action' folder
@@ -207,3 +209,7 @@ catkin_install_python(PROGRAMS
 
 ## Add folders to be run by python nosetests
 # catkin_add_nosetests(test)
+
+add_executable(light_service scripts/Light_service.cpp)
+target_link_libraries(light_service ${catkin_LIBRARIES})
+add_dependencies(light_service cpp_ros_generate_messages_cpp)

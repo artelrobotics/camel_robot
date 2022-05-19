@@ -2,10 +2,11 @@
 <launch>
     <arg name="robot_name"            default="$(env ROBOT_NAME)" />
     <arg name="base_frame"            default="base_link" />
-    <arg name="output"                default="screen" />
-    <arg name="addr" default="" />
-    <arg name="dof" default="2" />
-    <arg name="stamped" default="false" />
+    <arg name="output"                default="log" />
+    <arg name="common_modbus_ip"      default="192.168.1.111" />
+    <arg name="addr"                  default="" />
+    <arg name="dof"                   default="2" />
+    <arg name="stamped"               default="false" />
 
     <!-- Roboteq drivers -->
     <!-- bms -->
@@ -28,9 +29,8 @@
         <param name="odom_frame"            value="$(arg robot_name)/odom"/>
         <param name="encoder_topic_name"   value="/$(arg robot_name)/driver/encoder_count" />
         <param name="command_srv"          value="/$(arg robot_name)/driver/dualchannel_command_service" />
-        <param name="publish_tf"           value="false" /> <!-- Debug only -->
+        <param name="publish_tf"           value="false" /> 
     </node>
-
 
     <!-- DualShock4 -->
     <node pkg="ds4_driver" type="ds4_driver_node.py" name="ds4_joystick" output="screen" >
@@ -41,7 +41,6 @@
     <node pkg="ds4_driver" type="ds4_twist_node.py" name="ds4_twist" output="screen" >
         <rosparam command="load" file="$(find camel_robot)/config/bringup/ds4_2dof_config.yaml" />
         <param name="stamped" value="false" />
-        <remap from="/$(arg robot_name)/cmd_vel" to="/$(arg robot_name)/driver/cmd_vel"/>
     </node>
 
 

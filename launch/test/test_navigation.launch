@@ -1,0 +1,44 @@
+<?xml version="1.0"?>
+
+<launch>
+    
+    <arg name="robot_name"            default="$(env ROBOT_NAME)" />
+    <arg name="base_frame"            default="base_footprint" />
+    <arg name="output"                default="screen" />
+    <arg name="local_planner_type"    default="base"   doc="[base, dwa, teb]"/>
+    <arg name="mb"                    default="true" />
+    <!-- ****************** Arguments ******************** -->
+    <arg name="map_file" default="$(find camel_robot)/maps/office_29_03.yaml"/>
+
+    <!-- ************************ Map Server ************************* -->
+    <node name="map_server" pkg="map_server" type="map_server" args="$(arg map_file)" respawn="true">
+    <param name="frame_id" value="$(arg robot_name)/map"/>
+    </node>
+
+    <!-- ********************* AMCL ************************* -->
+    <include file="$(find camel_robot)/launch/navigation/amcl.launch">
+        <arg name="robot_name"            value="$(env ROBOT_NAME)" />
+        <arg name="base_frame"            value="$(arg base_frame)" />
+        <arg name="output"                value="$(arg output)" />
+        <arg name="gui_publish_rate"      value="5.0" />
+    </include>
+
+    <node pkg="camel_robot" name="initial_pose_saver" type="amcl_initial_pose_save.py" output="$(arg output)"  required='true'/>
+    <node pkg="camel_robot" name="goal_saver" type="goal_pose_saver_service.py" output="$(arg output)"  required='true'/>
+
+    <group if="$(arg mb)">
+        <node pkg="move_base" type="move_base" respawn="true" name="move_base" output="$(arg output)" >
+            <rosparam file="$(find camel_robot)/config/navigation/costmap_common_config.yaml" command="load" ns="global_costmap" subst_value="true" />
+            <rosparam file="$(find camel_robot)/config/navigation/costmap_common_config.yaml" command="load" ns="local_costmap" subst_value="true" />
+            <rosparam file="$(find camel_robot)/config/navigation/local_costmap_config.yaml"  command="load" />
+            <rosparam file="$(find camel_robot)/config/navigation/global_costmap_config.yaml" command="load" />
+            <rosparam file="$(find camel_robot)/config/navigation/$(arg local_planner_type)_local_planner_config.yaml" command="load"/>
+            <rosparam file="$(find camel_robot)/config/navigation/costmap_converter_config.yaml" command="load" />
+            <rosparam file="$(find camel_robot)/config/navigation/move_base_config.yaml" command="load" />
+            <rosparam file="$(find camel_robot)/config/navigation/global_planner_config.yaml" command="load"/>
+
+            <param name="base_global_planner" value="global_planner/GlobalPlanner" />
+            <remap from="/$(arg robot_name)/odom" to="/$(arg robot_name)/odometry"/>
+        </node> 
+    </group>
+</launch>

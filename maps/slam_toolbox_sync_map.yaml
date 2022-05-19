@@ -1,0 +1,7 @@
+image: /home/nvidia/maps/slam_toolbox_sync_map.pgm
+resolution: 0.050000
+origin: [-45.166658, -8.808782, 0.000000]
+negate: 0
+occupied_thresh: 0.65
+free_thresh: 0.196
+

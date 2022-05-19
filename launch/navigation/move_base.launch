@@ -10,6 +10,7 @@
 
         <param name="base_global_planner" value="global_planner/GlobalPlanner" />
         <param name="base_local_planner" value="base_local_planner/TrajectoryPlannerROS"/> 
+        
 
     </node> 
 </launch>

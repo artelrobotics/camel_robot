@@ -1,23 +1,32 @@
 <?xml version="1.0"?>
 <launch>
-    <arg name="front_lidar_ip"        default="192.168.1.3" />
-    <arg name="back_lidar_ip"         default="192.168.1.4" />
-    <arg name="common_modbus_ip"      default="192.168.1.111" />
+    <arg name="front_lidar_ip"        default="192.168.1.4" />
+    <arg name="back_lidar_ip"         default="192.168.1.3" />
+    <arg name="common_modbus_ip"      default="192.168.1.110" />
     <arg name="robot_name"            default="$(env ROBOT_NAME)" />
     <arg name="base_frame"            default="base_link" />
     <arg name="output"                default="screen" />
     <arg name="ws_port"               default="9090"/>
     <arg name="pub_tf"                default="false"/>
-
+    <arg name="sound_device"          default="" />
+    <arg name="sound_loop_rate"       default="100" />
+    <arg name="marker_size"           default="11.45" />
+	<arg name="max_new_marker_error"  default="0.02" />
+	<arg name="max_track_error"       default="0.5" />
+	<arg name="cam_image_topic"       default="front/zed/rgb_raw/image_raw_color" />
+	<arg name="cam_info_topic"        default="front/zed/rgb_raw/camera_info" />
+	<arg name="output_frame"          default="camel_amr_1000_001/base_link" />
+    
     <!-- Robot Description -->
     <param name="use_gui" value="false" />
     <param name="robot_description" command="$(find xacro)/xacro '$(find camel_urdf)/urdf/CAMEL-1000.urdf.xacro'  robot_model:=$(arg robot_name)
-    base_frame:=$(arg base_frame)"/>
+    base_frame:=base_footprint"/>
 
-    <!-- Joint State -->
-    <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher" respawn="true" output="$(arg output)"/>
     <!-- Robot State  -->
     <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" respawn="true" output="$(arg output)"/>
+    <!-- Joint State -->
+    <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher" respawn="true" output="$(arg output)"/>
+    
 
 
     <!-- SICK lidars launch -->
@@ -30,7 +39,7 @@
         <param name="frame_id" type="str" value="$(arg robot_name)/front_lidar"/>
         <param name="use_binary_protocol" type="bool" value="true"/>
         <param name="scanner_type" type="string" value="sick_lms_1xx"/>
-        <param name="range_max" type="double" value="25.0"/>
+        <param name="range_max" type="double" value="20.0"/>
         <param name="hostname" type="string" value="$(arg front_lidar_ip)"/>
         <param name="port" type="string" value="2112"/>
         <param name="timelimit" type="int" value="5"/>
@@ -38,8 +47,10 @@
         <param name="activate_lferec" type="bool" value="false"/>
         <param name="activate_lidoutputstate" type="bool" value="false"/> 
         <param name="activate_lidinputstate" type="bool" value="false"/> 
-        <param name="min_intensity" type="double" value="0.0"/> 
-    </node>
+        <param name="min_intensity" type="double" value="0.0"/>
+        <param name="ang_res" type="double" value="0.25"  />
+        <param name="scan_freq" type="double" value="25" />
+    </node> 
 
     <!-- Back Lidar -->
     <node name="sick" pkg="sick_scan" type="sick_generic_caller" respawn="false" output="$(arg output)" ns="back_lidar" required='true'>
@@ -50,7 +61,7 @@
         <param name="frame_id" type="str" value="$(arg robot_name)/back_lidar"/>
         <param name="use_binary_protocol" type="bool" value="true"/>
         <param name="scanner_type" type="string" value="sick_lms_1xx"/>
-        <param name="range_max" type="double" value="25.0"/>
+        <param name="range_max" type="double" value="20.0"/>
         <param name="hostname" type="string" value="$(arg back_lidar_ip)"/>
         <param name="port" type="string" value="2112"/>
         <param name="timelimit" type="int" value="5"/>
@@ -59,21 +70,24 @@
         <param name="activate_lidoutputstate" type="bool" value="false"/> 
         <param name="activate_lidinputstate" type="bool" value="false"/> 
         <param name="min_intensity" type="double" value="0.0"/> 
+        <param name="ang_res" type="double" value="0.25"  />
+        <param name="scan_freq" type="double" value="25" />
+        
     </node>
 
     <!-- Two lidars merger -->
     
     <node pkg="ira_laser_tools" name="scan_merger" type="laserscan_multi_merger" output="$(arg output)">
-        <param name="destination_frame" value="$(arg robot_name)/base_link"/>
+        <param name="destination_frame" value="$(arg robot_name)/laser"/>
         <param name="cloud_destination_topic" value="/$(arg robot_name)/merged_cloud"/>
         <param name="scan_destination_topic" value="/$(arg robot_name)/scan"/>
         <param name="laserscan_topics" value ="/$(arg robot_name)/front_lidar/scan /$(arg robot_name)/back_lidar/scan" /> 
         <param name="angle_min" value="-3.14159265359"/>
         <param name="angle_max" value="3.14159265359"/>
-        <param name="angle_increment" value="0.00872664619237"/>
-        <param name="scan_time" value="0.019999999552965164"/>
+        <param name="angle_increment" value="0.002181662"/>
+        <param name="scan_time" value="0.03999999910593033"/>
         <param name="range_min" value="0.05"/>
-        <param name="range_max" value="25.0"/>
+        <param name="range_max" value="20.0"/>
     </node>
     
 
@@ -107,7 +121,7 @@
         <param name="odom_frame"            value="$(arg robot_name)/odom"/>
         <param name="encoder_topic_name"   value="/$(arg robot_name)/driver/encoder_count" />
         <param name="command_srv"          value="/$(arg robot_name)/driver/dualchannel_command_service" />
-        <param name="publish_tf"           value="$(arg pub_tf)" /> <!-- Debug only -->
+        <param name="publish_tf"           value="false" /> <!-- Debug only -->
     </node>
 
 
@@ -122,7 +136,7 @@
         <param name="stream"                            value="" />
         <param name="general/zed_id"                    value="0" />
         <param name="general/gpu_id"                    value="-1" />
-        <param name="general/serial_number"             value="21229143" />
+        <param name="general/serial_number"             value="29520794" />
         <param name="pos_tracking/odometry_frame"       value="$(arg robot_name)/odom"/>
     </node>
 
@@ -136,14 +150,21 @@
         <param name="stream"                            value="" />
         <param name="general/zed_id"                    value="1" />
         <param name="general/gpu_id"                    value="-1" />
-        <param name="general/serial_number"             value="29520794" />
+        <param name="general/serial_number"             value="21229143" />
     </node>
+
+     <node pkg="pointcloud_to_laserscan" type="pointcloud_to_laserscan_node" name="pointcloud_to_laserscan">
+        <remap from="cloud_in" to="/camel_amr_1000_001/front/zed/point_cloud/cloud_registered"/>
+        <remap from="scan" to="points/scan"/>
+        <rosparam command="load" file="$(find camel_robot)/config/bringup/point_to_laser_config.yaml"/>
+    </node>
+
 
     <node pkg="robot_localization" type="ekf_localization_node" name="ekf_se" clear_params="true" output="$(arg output)">
         <rosparam command="load" file="$(find camel_robot)/config/slam/ekf_localization_config.yaml" />
 
         <param name="odom_frame" value="$(arg robot_name)/odom"/>
-        <param name="base_link_frame" value="$(arg robot_name)/$(arg base_frame)"/>
+        <param name="base_link_frame" value="$(arg robot_name)/base_footprint"/>
         <param name="world_frame" value="$(arg robot_name)/odom"/>
 
         <param name="odom0" value="/$(arg robot_name)/encoder/odom"/> 
@@ -170,9 +191,19 @@
     <!-- Robot Status-->
     <node pkg="camel_robot" name="robot_status" type="robot_status.py" output="$(arg output)"  required='true'/>
 
+    <!-- Goal finished signal-->
+    <node pkg="camel_robot" name="robot_sound_and_light" type="robot_sound_and_light.py" output="$(arg output)"  required='true'/>
+
+    <!-- Robot Sound-->
+    <node name="soundplay_node" pkg="sound_play" type="soundplay_node.py">
+        <param name="device" value="$(arg sound_device)" />
+        <param name="loop_rate" value="$(arg sound_loop_rate)" />
+    </node>
+
+    <node pkg="camel_robot" name="robot_sound_service" type="robot_sound_service.py" output="$(arg output)"  required='true'/>
 
     <!-- DualShock4 -->
-    <node pkg="ds4_driver" type="ds4_driver_node.py" name="ds4_driver" output="screen" >
+    <!-- <node pkg="ds4_driver" type="ds4_driver_node.py" name="ds4_driver" output="screen" >
         <param name="backend" value="bluetooth" />
         <param name="device_addr" value="" />
         <param name="use_standard_msgs" value="false"/>
@@ -180,9 +211,19 @@
     <node pkg="ds4_driver" type="ds4_twist_node.py" name="ds4_twist" output="screen" >
         <rosparam command="load" file="$(find camel_robot)/config/bringup/ds4_2dof_config.yaml" />
         <param name="stamped" value="false" />
-        <remap from="/$(arg robot_name)/cmd_vel" to="/$(arg robot_name)/driver/cmd_vel"/>
-    </node>
+    </node> -->
 
+    <!-- Aruco detection -->
+    <!-- <node name="ar_track_alvar" pkg="ar_track_alvar" type="individualMarkersNoKinect" respawn="false" output="screen">
+		<param name="marker_size"           type="double" value="$(arg marker_size)" />
+		<param name="max_new_marker_error"  type="double" value="$(arg max_new_marker_error)" />
+		<param name="max_track_error"       type="double" value="$(arg max_track_error)" />
+		<param name="output_frame"          type="string" value="$(arg output_frame)" />
+
+		<remap from="camera_image"  to="$(arg cam_image_topic)" />
+		<remap from="camera_info"   to="$(arg cam_info_topic)" />
+	</node>
+     -->
 
 
     <!-- Multimaster -->
@@ -207,7 +248,7 @@
 
     <node name="rosapi" pkg="rosapi" type="rosapi_node" output="$(arg output)">
         <rosparam command="load" file="$(find camel_robot)/config/bringup/rosbridge_glob_config.yaml"/>
-    </node> -->
-    
+    </node>
+     -->
     
 </launch>

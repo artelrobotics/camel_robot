@@ -10,14 +10,8 @@
 
         <!-- ************************ Map Server ************************* -->
         <node name="map_server" pkg="map_server" type="map_server" args="$(arg map_file)" respawn="true">
+        <param name="frame_id" value="$(arg robot_name)/map"/>
         </node>
-
-        <!-- ********************* Robot Localization ************************* -->
-        <include file="$(find camel_robot)/launch/slam/ekf_localization.launch">
-            <arg name="robot_name"            value="$(env ROBOT_NAME)" />
-            <arg name="base_frame"            value="$(arg base_frame)" />
-            <arg name="output"                value="$(arg output)" />
-        </include>
 
         <!-- ********************* AMCL ************************* -->
         <include file="$(find camel_robot)/launch/navigation/amcl.launch">

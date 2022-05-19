@@ -3,6 +3,7 @@ from Light_control import LightControl
 import rospy
 from rospy.core import rospyerr ,loginfo
 from camel_robot.srv import light
+import time
 class LightService:
 
     def __init__(self):
@@ -21,32 +22,37 @@ class LightService:
         
         elif(self.command == "light_type_1"):
             self.lc.light_type_1()
-            loginfo("Lighting_type_1 is on!")
             self.result = "Lighting_type_1 is on!"
         
         elif(self.command == "light_type_2"):
             self.lc.light_type_2()
-            loginfo("Lighting_type_2 is on!")
             self.result = "Lighting_type_2 is on!"
         
         elif(self.command == "light_type_3"):
             self.lc.light_type_3()
-            loginfo("Lighting_type_3 is on!")
             self.result = "Lighting_type_3 is on!"
         
         elif(self.command == "light_type_4"):
             self.lc.light_type_4()
-            loginfo("Lighting_type_4 is on!")
             self.result = "Lighting_type_4 is on!"
         
         elif(self.command == "light_type_5"):
             self.lc.light_type_5()
-            loginfo("Lighting_type_5 is on!")
             self.result = "Lighting_type_5 is on!"
         
+        elif(self.command == "light_type_6"):
+            self.lc.light_type_4()
+            time.sleep(0.5)
+            self.lc.light_off()
+            time.sleep(0.5)
+            self.result = "Lighting_type_6 is on!"
+        
+        elif(self.command == "light_type_7"):
+            self.lc.light_type_7()
+            self.result = "Lighting_type_7 is on!"
+
         elif(self.command == "light_dance"):
             self.lc.light_dance()
-            loginfo("Light Dance has been done!")
             self.result = "Light Dance has been done!"
         
         else:

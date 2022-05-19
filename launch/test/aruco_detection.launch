@@ -1,0 +1,74 @@
+<launch>
+    <!-- namespace for camera input -->
+    <arg name="robot_name"            default="$(env ROBOT_NAME)" />
+    <arg name="base_frame"            default="base_link" />
+    <arg name="output"                default="screen" />
+    <arg name="marker_size"           default="11.45" />
+	<arg name="max_new_marker_error"  default="0.02" />
+	<arg name="max_track_error"       default="0.5" />
+	<arg name="cam_image_topic"       default="front/zed/rgb_raw/image_raw_color" />
+	<arg name="cam_info_topic"        default="front/zed/rgb_raw/camera_info" />
+	<arg name="output_frame"          default="camel_amr_1000_001/base_link" />
+
+    <!-- Robot Description -->
+    <param name="use_gui" value="false" />
+    <param name="robot_description" command="$(find xacro)/xacro '$(find camel_urdf)/urdf/CAMEL-1000.urdf.xacro'  robot_model:=$(arg robot_name)
+    base_frame:=base_footprint"/>
+
+    <!-- Robot State  -->
+    <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" respawn="true" output="$(arg output)"/>
+    <!-- Joint State -->
+    <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher" respawn="true" output="$(arg output)"/>
+    
+   
+    
+    <!-- bms -->
+    <node name="bms"  pkg="roboteq_bms" type="roboteq_bms.py"  output="$(arg output)"  required='true'>
+        <param name="port"         value="/dev/RoboteqBMS"/>
+        <param name="baud"         value="115200"/>
+        <param name="desired_freq" value="2"/>
+    </node>
+   
+    <!-- motor driver -->
+    <node name = "driver" pkg = "roboteq_motor_controller_driver" type = "roboteq_motor_controller_driver_node" output="$(arg output)" required='true'>
+        <rosparam command="load" file="$(find camel_robot)/config/bringup/motor_driver_config.yaml" />
+        <param name="port"  value="/dev/RoboteqDriver"/>
+        <param name="baud"  value="115200"/>
+    </node>
+
+    <!-- encoder odometry -->
+    <node name = "encoder" pkg = "roboteq_motor_controller_driver" type = "diff_odom" output="$(arg output)" required='true'>
+        <rosparam command="load" file="$(find camel_robot)/config/bringup/odom_encoder_config.yaml" />
+        <param name="base_frame"            value="$(arg robot_name)/base_link"/>
+        <param name="odom_frame"            value="$(arg robot_name)/odom"/>
+        <param name="encoder_topic_name"   value="/$(arg robot_name)/driver/encoder_count" />
+        <param name="command_srv"          value="/$(arg robot_name)/driver/dualchannel_command_service" />
+        <param name="publish_tf"           value="false" /> <!-- Debug only -->
+    </node>
+
+    <!-- Front ZED2 -->
+    <node name="zed" pkg="zed_wrapper" type="zed_wrapper_node" output="$(arg output)" ns="front" required="true">
+        <rosparam file="$(find camel_robot)/config/bringup/zed2_front_config.yaml" command="load" />
+        <rosparam file="$(find camel_robot)/config/bringup/zed2_common_config.yaml" command="load" />
+        <param name="general/camera_name"               value="$(arg robot_name)/zed_front" />
+        <param name="general/base_frame"                value="$(arg robot_name)/$(arg base_frame)" />
+        <param name="svo_file"                          value="" />
+        <param name="stream"                            value="" />
+        <param name="general/zed_id"                    value="0" />
+        <param name="general/gpu_id"                    value="-1" />
+        <param name="general/serial_number"             value="29520794" />
+        <param name="pos_tracking/odometry_frame"       value="$(arg robot_name)/odom"/>
+    </node>
+
+    <!-- Aruco detection -->
+    <node name="ar_track_alvar" pkg="ar_track_alvar" type="individualMarkersNoKinect" respawn="false" output="screen">
+		<param name="marker_size"           type="double" value="$(arg marker_size)" />
+		<param name="max_new_marker_error"  type="double" value="$(arg max_new_marker_error)" />
+		<param name="max_track_error"       type="double" value="$(arg max_track_error)" />
+		<param name="output_frame"          type="string" value="$(arg output_frame)" />
+
+		<remap from="camera_image"  to="$(arg cam_image_topic)" />
+		<remap from="camera_info"   to="$(arg cam_info_topic)" />
+	</node>
+
+</launch>

@@ -6,12 +6,6 @@ ceres_trust_strategy: LEVENBERG_MARQUARDT
 ceres_dogleg_type: TRADITIONAL_DOGLEG
 ceres_loss_function: None
 
-# ROS Parameters
-odom_frame: odom
-map_frame: map
-base_frame: base_footprint
-scan_topic: /scan
-mode: mapping
 
 # lifelong params
 lifelong_search_use_tree: false

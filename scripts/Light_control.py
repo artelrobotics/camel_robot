@@ -91,7 +91,7 @@ class LightControl():
             Blinking lines are on.
         """
         i = 0
-        while i<20:
+        while i<2:
             light = [0,0,1,0,0,1]
             self.write_coils(light)
             time.sleep(0.2)
@@ -99,6 +99,18 @@ class LightControl():
             self.write_coils(light)
             time.sleep(0.2)
             i=i+1
+    
+    def light_type_7(self):
+        """
+            Blinking lines are on.
+        """
+        light = [0,0,1,0,0,1]
+        self.write_coils(light)
+        time.sleep(0.2)
+        light = [0,0,0,0,0,0]
+        self.write_coils(light)
+        time.sleep(0.2)
+        
 
     def light_dance(self):
         """

@@ -74,10 +74,18 @@ def bms_status_flags_callback(data):
                     "roboteq_bms/Cell Under Volt", "roboteq_bms/Unsafe Temperature", "roboteq_bms/Bad State of Health",
                      "roboteq_bms/Balancing", "roboteq_bms/RunScript"]
     #print(data.data)
-    if(int(data.data) == 0):
-        status = ["BMS_Status_flag/Normal"]
-    else:
-        status = check_states(status_naming, state=int(data.data))    
+    try :
+        if data.data == '':
+            status = ["BMS_Status_flag/Empty"]
+            pass
+            
+        elif(int(data.data) == 0):
+            status = ["BMS_Status_flag/Normal"]
+        else:
+            status = check_states(status_naming, state=int(data.data))    
+    except ValueError:
+        pass
+    
     #rospy.loginfo(status)
     robot_status.bms_status.status_flag = status
     status_pub.publish(robot_status)
@@ -93,11 +101,17 @@ def bms_fault_flags_callback(data):
                      "roboteq_bms/Inverse Charger", "roboteq_bms/OC Pack In", "roboteq_bms/OC Pack Out", 
                      "roboteq_bms/Internal Fault", "roboteq_bms/Config Error"]
 
+    try:
+        if data.data == '':
+            status = ["BMS_Fault_flag/Empty"]
+            pass
+        elif(int(data.data) == 0):
+            status = ["BMS_Fault_flag/Normal"]
+        else:
+            status = check_states(status_naming, state=int(data.data))    
+    except ValueError:
+        pass
     
-    if(int(data.data) == 0):
-        status = ["BMS_Status_flag/Normal"]
-    else:
-        status = check_states(status_naming, state=int(data.data))    
     #rospy.loginfo(status)
     robot_status.bms_status.fault_flag = status
     status_pub.publish(robot_status)

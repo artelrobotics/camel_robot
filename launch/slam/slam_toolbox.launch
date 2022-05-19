@@ -4,8 +4,12 @@
     <arg name="type"        default="sync" doc="types: sync, async, lifelong"/>
     <arg name="base_frame"  default="base_link" />
     <arg name="output"      default="screen" />
+    <arg name="map_file_name"     default="" />
+    <arg name="map_start_pose"    default="[0.0, 0.0, 0.0]" />
 
-    <group if="$(eval type == async)">
+
+
+    <group if="$(eval type == 'async')">
         <node pkg="slam_toolbox" type="async_slam_toolbox_node" name="slam_toolbox" output="$(arg output)">
             <rosparam command="load" file="$(find camel_robot)/config/slam/st_online_config.yaml" />
             <param name="odom_frame" value="$(arg robot_name)/odom"/>
@@ -13,10 +17,14 @@
             <param name="base_frame" value="$(arg robot_name)/$(arg base_frame)"/>
             <param name="scan_topic" value="/$(arg robot_name)/scan"/>
             <param name="map_name" value="/$(arg robot_name)/map"/>
+            <param name="map_file_name"     value="$(arg map_file_name)"/>
+            <param name="map_start_pose"    value="$(arg map_start_pose)"/>
+            <param name="map_start_at_dock" value="true"/>
+
         </node>
     </group>
 
-    <group if="$(eval type == sync)">
+    <group if="$(eval type == 'sync')">
         <node pkg="slam_toolbox" type="sync_slam_toolbox_node" name="slam_toolbox" output="$(arg output)">
             <rosparam command="load" file="$(find camel_robot)/config/slam/st_online_config.yaml" />
             <param name="odom_frame" value="$(arg robot_name)/odom"/>
@@ -24,10 +32,13 @@
             <param name="base_frame" value="$(arg robot_name)/$(arg base_frame)"/>
             <param name="scan_topic" value="/$(arg robot_name)/scan"/>
             <param name="map_name" value="/$(arg robot_name)/map"/>
+            <param name="map_file_name"     value="$(arg map_file_name)" />
+            <!-- <param name="map_start_pose"    value="$(arg map_start_pose)" /> -->
+            <param name="map_start_at_dock" value="true"/>
         </node>
     </group>
 
-    <group if="$(eval type == lifelong)">
+    <group if="$(eval type == 'lifelong')">
         <node pkg="slam_toolbox" type="lifelong_slam_toolbox_node" name="slam_toolbox" output="$(arg output)">
             <rosparam command="load" file="$(find camel_robot)/config/slam/st_lifelong_config.yaml" />
             <param name="odom_frame" value="$(arg robot_name)/odom"/>

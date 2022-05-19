@@ -1,0 +1,5 @@
+string name
+---
+string frame_id
+geometry_msgs/Pose goal_pose
+bool result
