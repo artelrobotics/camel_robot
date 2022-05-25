@@ -127,7 +127,7 @@
 
     <!-- ZED Camera -->
     <!-- Front ZED2 -->
-    <node name="zed" pkg="zed_wrapper" type="zed_wrapper_node" output="$(arg output)" ns="front" required="true">
+    <!-- <node name="zed" pkg="zed_wrapper" type="zed_wrapper_node" output="$(arg output)" ns="front" required="true">
         <rosparam file="$(find camel_robot)/config/bringup/zed2_front_config.yaml" command="load" />
         <rosparam file="$(find camel_robot)/config/bringup/zed2_common_config.yaml" command="load" />
         <param name="general/camera_name"               value="$(arg robot_name)/zed_front" />
@@ -138,10 +138,10 @@
         <param name="general/gpu_id"                    value="-1" />
         <param name="general/serial_number"             value="29520794" />
         <param name="pos_tracking/odometry_frame"       value="$(arg robot_name)/odom"/>
-    </node>
+    </node> -->
 
     <!-- Back ZED2 -->
-    <node name="zed" pkg="zed_wrapper" type="zed_wrapper_node" output="$(arg output)" ns="back" required="true">
+    <!-- <node name="zed" pkg="zed_wrapper" type="zed_wrapper_node" output="$(arg output)" ns="back" required="true">
         <rosparam file="$(find camel_robot)/config/bringup/zed2_back_config.yaml" command="load" />
         <rosparam file="$(find camel_robot)/config/bringup/zed2_common_config.yaml" command="load" />
         <param name="general/camera_name"               value="$(arg robot_name)/zed_back" />
@@ -176,11 +176,11 @@
         <remap from="/$(arg robot_name)/odometry/filtered" to="/$(arg robot_name)/odometry"/>
         <remap from="/$(arg robot_name)/accel/filtered" to="/$(arg robot_name)/accel"/>
 
-    </node>
+    </node> -->
 
 
-    <!-- Hooks Control-->
-    <node pkg="camel_robot" name="hook" type="hook_cntrl.py" output="$(arg output)"  required='true' ns="common"/>
+    <!-- Hooks Service-->
+    <node pkg="camel_robot" name="hook_service" type="hook_service.py" output="$(arg output)"  required='true' ns="common"/>
 
     <!-- Light Control-->
     <node pkg="camel_robot" name="light_control" type="Light_control.py" output="$(arg output)"  required='true' ns="common"/>
@@ -203,7 +203,7 @@
     <node pkg="camel_robot" name="robot_sound_service" type="robot_sound_service.py" output="$(arg output)"  required='true'/>
 
     <!-- DualShock4 -->
-    <!-- <node pkg="ds4_driver" type="ds4_driver_node.py" name="ds4_driver" output="screen" >
+    <node pkg="ds4_driver" type="ds4_driver_node.py" name="ds4_driver" output="screen" >
         <param name="backend" value="bluetooth" />
         <param name="device_addr" value="" />
         <param name="use_standard_msgs" value="false"/>
@@ -211,7 +211,7 @@
     <node pkg="ds4_driver" type="ds4_twist_node.py" name="ds4_twist" output="screen" >
         <rosparam command="load" file="$(find camel_robot)/config/bringup/ds4_2dof_config.yaml" />
         <param name="stamped" value="false" />
-    </node> -->
+    </node>
 
     <!-- Aruco detection -->
     <!-- <node name="ar_track_alvar" pkg="ar_track_alvar" type="individualMarkersNoKinect" respawn="false" output="screen">

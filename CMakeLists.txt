@@ -12,6 +12,7 @@ find_package(catkin REQUIRED COMPONENTS
   rospy
   sensor_msgs
   std_msgs
+  ethernet_remote_io_module
   message_generation
 )
 
@@ -210,6 +211,10 @@ catkin_install_python(PROGRAMS
 ## Add folders to be run by python nosetests
 # catkin_add_nosetests(test)
 
-add_executable(light_service scripts/Light_service.cpp)
-target_link_libraries(light_service ${catkin_LIBRARIES})
-add_dependencies(light_service cpp_ros_generate_messages_cpp)
+add_executable(Light_service scripts/Light_service.cpp)
+target_link_libraries(Light_service ${catkin_LIBRARIES})
+add_dependencies(Light_service camel_robot_generate_messages_cpp)
+
+add_executable(Light_control_cpp scripts/Light_control_cpp.cpp)
+target_link_libraries(Light_control_cpp ${catkin_LIBRARIES})
+add_dependencies(Light_control_cpp camel_robot_generate_messages_cpp)

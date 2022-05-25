@@ -3,7 +3,7 @@
     <arg name="robot_name"            default="$(env ROBOT_NAME)" />
     <arg name="base_frame"            default="base_link" />
     <arg name="output"                default="log" />
-    <arg name="common_modbus_ip"      default="192.168.1.111" />
+    <arg name="common_modbus_ip"      default="192.168.1.110" />
     <arg name="addr"                  default="" />
     <arg name="dof"                   default="2" />
     <arg name="stamped"               default="false" />
