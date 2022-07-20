@@ -5,7 +5,7 @@ publish_frequency: 2.0
 # obstacle_range: 6.0
 publish_voxel_map: true
 navigation_map:
-  map_topic: /camel_amr_1000_001/map
+   map_topic: /camel_amr_1000_001/map
 obstacles:
   observation_sources:  b_scan_marking b_scan_clearing f_scan_marking f_scan_clearing #points_scan
   b_scan_marking: {
@@ -18,7 +18,7 @@ obstacles:
     observation_persistence: 0.0, 
     min_obstacle_height: 0.0, 
     max_obstacle_height: 2.0, 
-    obstacle_range: 5.0,
+    obstacle_range: 3.0,
     raytrace_range: 5.5,
     inf_is_valid: true,
     track_unknown_space: false}
@@ -33,7 +33,7 @@ obstacles:
     observation_persistence: 0.0, 
     min_obstacle_height: 0.0, 
     max_obstacle_height: 2.0, 
-    obstacle_range: 5.0,
+    obstacle_range: 3.0,
     raytrace_range: 5.5,
     inf_is_valid: true,
     track_unknown_space: false}
@@ -47,7 +47,7 @@ obstacles:
     observation_persistence: 0.0, 
     min_obstacle_height: 0.0, 
     max_obstacle_height: 2.0, 
-    obstacle_range: 5.0,
+    obstacle_range: 3.0,
     raytrace_range: 5.5,
     inf_is_valid: true,
     track_unknown_space: false}
@@ -61,7 +61,7 @@ obstacles:
     observation_persistence: 0.0, 
     min_obstacle_height: 0.0, 
     max_obstacle_height: 2.0,
-    obstacle_range: 5.0,
+    obstacle_range: 3.0,
     raytrace_range: 5.5, 
     inf_is_valid: true,
     track_unknown_space: false}
@@ -81,5 +81,5 @@ obstacles:
     track_unknown_space: false}
 
 virtual_walls_map:
-  map_topic: /virtual_walls/map
+  map_topic: /camel_amr_1000_001/virtual_map
   use_maximum: true

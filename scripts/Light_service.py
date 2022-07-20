@@ -42,10 +42,10 @@ class LightService:
         
         elif(self.command == "light_type_6"):
             self.lc.light_type_4()
-            time.sleep(0.5)
-            self.lc.light_off()
-            time.sleep(0.5)
-            self.result = "Lighting_type_6 is on!"
+            # time.sleep(0.5)
+            # self.lc.light_off()
+            # time.sleep(0.5)
+            # self.result = "Lighting_type_6 is on!"
         
         elif(self.command == "light_type_7"):
             self.lc.light_type_7()

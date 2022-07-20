@@ -3,8 +3,12 @@ import rospy
 import yaml
 import rospkg
 
+def shutdown_hook():
+    file.close()
+
 if __name__ == "__main__":
     rospy.init_node("amcl_pose")
+    rospy.on_shutdown(shutdown_hook)
     pose = {}
     rospack = rospkg.RosPack()
     base_path = rospack.get_path("camel_robot")
@@ -23,8 +27,11 @@ if __name__ == "__main__":
                 
                 with open(file_path, 'w') as file:
                     yaml.dump(pose, file, default_flow_style=False)
+                
         except Exception as e:
+            file.close()
             rospy.logwarn(e)
-        
-        
+            
         r.sleep()
+    else:
+        file.close()

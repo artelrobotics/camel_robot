@@ -1,19 +1,39 @@
 <?xml version="1.0"?>
 
 <launch>
-    
+    <!-- ****************** Arguments ******************** -->
     <arg name="robot_name"            default="$(env ROBOT_NAME)" />
     <arg name="base_frame"            default="base_footprint" />
-    <arg name="output"                default="screen" />
+    <arg name="output"                default="log" />
     <arg name="local_planner_type"    default="base"   doc="[base, dwa, teb]"/>
     <arg name="mb"                    default="true" />
-    <!-- ****************** Arguments ******************** -->
-    <arg name="map_file" default="$(find camel_robot)/maps/office_29_03.yaml"/>
+    <arg name="with_virtual_walls"    default="false" doc="Enables usage of virtual walls when set. Set to false when running SLAM." />
+    <arg name="map_name"              default=""/>
+    <arg name="navigation_map_file"   default="$(arg map_name).yaml"/>
+    <arg name="virtual_map_file"      default="$(arg map_name)_virtual.yaml"/>
+    <arg name="marker_size"           default="11.45" />
+	<arg name="max_new_marker_error"  default="0.02" />
+	<arg name="max_track_error"       default="0.5" />
+	<arg name="cam_image_topic_front" default="/camel_amr_1000_001/front/zed/rgb_raw/image_raw_color" />
+	<arg name="cam_info_topic_front"  default="/camel_amr_1000_001/front/zed/rgb_raw/camera_info" />
+	<arg name="output_frame"          default="/camel_amr_1000_001/base" />
+    <arg name="cam_image_topic_back"  default="/camel_amr_1000_001/back/zed/rgb_raw/image_raw_color" />
+	<arg name="cam_info_topic_back"   default="/camel_amr_1000_001/back/zed/rgb_raw/camera_info" />
+	<arg name="output_frame"          default="/camel_amr_1000_001/base" />
+    
 
     <!-- ************************ Map Server ************************* -->
-    <node name="map_server" pkg="map_server" type="map_server" args="$(arg map_file)" respawn="true">
+    <node name="map_server" pkg="map_server" type="map_server" args="$(arg navigation_map_file)" required='true'>
     <param name="frame_id" value="$(arg robot_name)/map"/>
     </node>
+
+    <!-- ************************ Virtual Map Server ************************* -->
+    <group if="$(arg with_virtual_walls)">
+        <node name="virtual_map_server" pkg="map_server" type="map_server" args="$(arg virtual_map_file)" required='true'>
+            <param name="frame_id" value="$(arg robot_name)/map"/>
+            <remap from="map" to="virtual_map"/>
+        </node>
+    </group>
 
     <!-- ********************* AMCL ************************* -->
     <include file="$(find camel_robot)/launch/navigation/amcl.launch">
@@ -36,9 +56,39 @@
             <rosparam file="$(find camel_robot)/config/navigation/costmap_converter_config.yaml" command="load" />
             <rosparam file="$(find camel_robot)/config/navigation/move_base_config.yaml" command="load" />
             <rosparam file="$(find camel_robot)/config/navigation/global_planner_config.yaml" command="load"/>
-
+            <rosparam file="$(find camel_robot)/config/navigation/costmap_global_params_plugins_virtual_walls.yaml" command="load" if="$(arg with_virtual_walls)" />
             <param name="base_global_planner" value="global_planner/GlobalPlanner" />
             <remap from="/$(arg robot_name)/odom" to="/$(arg robot_name)/odometry"/>
         </node> 
     </group>
+
+
+
+    <!-- Aruco detection front camera -->
+    <node name="ar_track_alvar_front" pkg="ar_track_alvar" type="individualMarkersNoKinect" respawn="false" output="screen" ns="front">
+		<param name="marker_size"           type="double" value="$(arg marker_size)" />
+		<param name="max_new_marker_error"  type="double" value="$(arg max_new_marker_error)" />
+		<param name="max_track_error"       type="double" value="$(arg max_track_error)" />
+		<param name="output_frame"          type="string" value="$(arg output_frame)" />
+		<remap from="camera_image"  to="$(arg cam_image_topic_front)" />
+		<remap from="camera_info"   to="$(arg cam_info_topic_front)" />
+
+	</node>
+
+     <!-- Aruco detection backward camera-->
+    <node name="ar_track_alvar_back" pkg="ar_track_alvar" type="individualMarkersNoKinect" respawn="false" output="screen" ns="back">
+		<param name="marker_size"           type="double" value="$(arg marker_size)" />
+		<param name="max_new_marker_error"  type="double" value="$(arg max_new_marker_error)" />
+		<param name="max_track_error"       type="double" value="$(arg max_track_error)" />
+		<param name="output_frame"          type="string" value="$(arg output_frame)" />
+		<remap from="camera_image"  to="$(arg cam_image_topic_back)" />
+		<remap from="camera_info"   to="$(arg cam_info_topic_back)" />
+	</node>
+    <!-- Docking Service-->
+    <node pkg="camel_robot" name="Docking_service" type="parking.py" output="$(arg output)"  required='true'/>
+
+    <!-- Obstacle Detector -->
+    <include file="$(find obstacle_detector)/launch/nodes.launch"/>
+
+    
 </launch>

@@ -1,0 +1,6 @@
+image: ./4_07_2022_virtual.pgm
+resolution: 0.050000
+origin: [-42.395201, -22.340431, 0.000000]
+negate: 0
+occupied_thresh: 0.65
+free_thresh: 0.196

@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<launch>
+    <arg name="robot_name"            default="$(env ROBOT_NAME)" />
+    <arg name="base_frame"            default="base_link" />
+    <arg name="output"                default="screen" />
+    <arg name="ws_port"               default="9090"/>
+    <!-- Multimaster -->
+    <!-- Multimaster Discovery -->
+    <!-- <node name="master_discovery" pkg="fkie_master_discovery" type="master_discovery" output="$(arg output)">
+        <rosparam command="load" file="$(find camel_robot)/config/bringup/master_disc_config.yaml"/>
+    </node> -->
+
+    <!-- Multimaster Sync -->
+    <!-- <node name="master_sync" pkg="fkie_master_sync" type="master_sync" output="$(arg output)">
+        <rosparam command="load" file="$(find camel_robot)/config/bringup/master_sync_config.yaml"/>
+    </node> -->
+
+
+    <!-- Rosbridge Websocket -->
+    <node name="rosbridge_websocket" pkg="rosbridge_server" type="rosbridge_websocket" output="$(arg output)">
+        <rosparam command="load" file="$(find camel_robot)/config/bringup/rosbridge_ws_config.yaml"/>
+        <param name="port" value="$(arg ws_port)"/>
+        <!-- <param name="address" value="$(env HOSTNAME)"/> -->
+        <param name="address" value="$(env ROS_IP)"/>
+        <rosparam command="load" file="$(find camel_robot)/config/bringup/rosbridge_glob_config.yaml"/>
+    </node>
+
+    <node name="rosapi" pkg="rosapi" type="rosapi_node" output="$(arg output)">
+        <rosparam command="load" file="$(find camel_robot)/config/bringup/rosbridge_glob_config.yaml"/>
+    </node>
+</launch>

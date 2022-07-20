@@ -6,7 +6,7 @@ from pymodbus.client.sync import ModbusTcpClient
 from rospy import loginfo, logerr, logwarn, loginfo_once
 import threading
 import time
-
+from time import sleep
 
 def validate_ip(ip: str) -> bool:
     regex = r"^((25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])\.){3}(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])$"
@@ -23,21 +23,36 @@ def shutdown_hook() -> None:
 def write_coil(msg: WriteCoil) -> None:
     address = msg.address
     value = msg.value
-    client.write_coil(address=address, value= value, unit=0x01)
+    try:
+        res = client.write_coil(address=address, value= value, unit=0x01)
+        sleep(0.1)
+        if res.isError():
+            rospy.logwarn(f'res = {res}   res type = {type(res)}')
+    except Exception as e:
+        rospy.logerr(e)
 
 def write_coils(msg: WriteCoilsList) -> None:
     value = msg.value
     address = 2
-    client.write_coils(address=address, values=value, unit=1)
-    
+    try:
+        res = client.write_coils(address=address, values=value, unit=0x01)
+        sleep(0.1)
+        if res.isError():
+            rospy.logwarn(f'res = {res}   res type = {type(res)}')
+    except Exception as e:
+        rospy.logerr(e)
+        
 def read_inputs() -> None:
     while not rospy.is_shutdown():
         pub_msg = ReadDigitalInputs()
         try:
             res = client.read_discrete_inputs(address=0, count=8, unit=0x01)
-            pub_msg.all_inputs = res.bits
-            pub.publish(pub_msg)
-            rate.sleep()
+            if res.isError():
+                rospy.logwarn(f'res = {res}   res type = {type(res)}')
+            else:
+                pub_msg.all_inputs = res.bits
+                pub.publish(pub_msg)
+                rate.sleep()
         except Exception as e:
             rospy.logerr(e)
 
@@ -60,7 +75,7 @@ if __name__ == "__main__":
         client = ModbusTcpClient(host=ip_address, port=port)
         if client.connect():
             loginfo('Connection Success')
-            rate = rospy.Rate(10)
+            rate = rospy.Rate(70)
             rospy.Subscriber("write_coil", WriteCoil, callback=write_coil, queue_size=1)
             rospy.Subscriber("write_coils", WriteCoilsList, callback=write_coils, queue_size=1)
             pub = rospy.Publisher("read_inputs", ReadDigitalInputs, queue_size=1)

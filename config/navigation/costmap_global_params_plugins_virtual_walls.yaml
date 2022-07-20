@@ -1,0 +1,4 @@
+global_costmap:
+    plugins:
+        - {name: virtual_walls_map, type: "costmap_2d::StaticLayer" }
+        - {name: inflation,  type: "costmap_2d::InflationLayer" }

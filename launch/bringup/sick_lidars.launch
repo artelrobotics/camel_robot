@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <launch>
-    <arg name="front_lidar_ip"        default="192.168.1.4" />
-    <arg name="back_lidar_ip"         default="192.168.1.3" />
+    <arg name="front_lidar_ip"        default="192.168.1.3" />
+    <arg name="back_lidar_ip"         default="192.168.1.4" />
     <arg name="robot_name"            default="$(env ROBOT_NAME)" />
     <arg name="base_frame"            default="base_link" />
     <arg name="output"                default="screen" />
@@ -19,7 +19,8 @@
         <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" respawn="true" output="$(arg output)"/>
     </group>
 
-    <!-- <node name="sick_lms" pkg="sick_scan" type="sick_generic_caller" respawn="false" output="$(arg output)" ns="front_lidar" required='true'>
+    <!-- Front Lidar -->
+    <node name="sick_lms" pkg="sick_scan" type="sick_generic_caller" respawn="false" output="$(arg output)" ns="front_lidar" required='true'>
         <param name="intensity" type="bool" value="False"/>
         <param name="intensity_resolution_16bit" type="bool" value="false"/>
         <param name="min_ang" type="double" value="-2.35619"/>
@@ -38,7 +39,7 @@
         <param name="min_intensity" type="double" value="0.0"/> 
 
         
-    </node> -->
+    </node>
 
     <!-- Back Lidar -->
     <node name="sick_lms" pkg="sick_scan" type="sick_generic_caller" respawn="false" output="$(arg output)" ns="back_lidar" required='true'>
@@ -63,7 +64,7 @@
     </node>
 
     <!-- Two lidars merger -->
-    <!-- <node pkg="ira_laser_tools" name="scan_merger" type="laserscan_multi_merger" output="$(arg output)">
+    <node pkg="ira_laser_tools" name="scan_merger" type="laserscan_multi_merger" output="$(arg output)">
         <param name="destination_frame" value="$(arg robot_name)/laser"/>
         <param name="cloud_destination_topic" value="/$(arg robot_name)/merged_cloud"/>
         <param name="scan_destination_topic" value="/$(arg robot_name)/scan"/>
@@ -74,6 +75,6 @@
         <param name="scan_time" value="0.03999999910593033"/>
         <param name="range_min" value="0.05"/>
         <param name="range_max" value="20.0"/>
-    </node> -->
+    </node>
 
 </launch>

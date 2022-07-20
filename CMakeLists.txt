@@ -63,6 +63,7 @@ add_message_files(
    light.srv
    pose_save.srv
    sound.srv
+   docking.srv
  )
 
 ## Generate actions in the 'action' folder

@@ -3,12 +3,15 @@ from typing import List
 import rospy
 import time
 from ethernet_remote_io_module.msg import ReadDigitalInputs, WriteCoil, WriteCoilsList
+
 class LightControl():
     def __init__(self) -> None:
-        
+        self.rate = rospy.Rate(20)  # Rate in Hz
         self.read_digital_inputs_subscriber = rospy.Subscriber('read_inputs', ReadDigitalInputs, self.read_digital_callback)
         self.write_coils_publisher = rospy.Publisher('write_coils', WriteCoilsList, queue_size=10)
+        self.write_coil_publisher = rospy.Publisher('/camel_amr_1000_001/common/write_coil', WriteCoil, queue_size=1)
         self.write_coils_msg = WriteCoilsList()
+        self.pub_msg = WriteCoil()
         self.ctrl_c = False
         rospy.on_shutdown(self.shutdownhook)
         
@@ -54,6 +57,22 @@ class LightControl():
         self.write_coils_msg.value = value
         self.write_once_in_coil()
 
+    def hook_up(self):
+        """
+            Hook up
+        """
+        self.pub_msg.address = 0
+        self.pub_msg.value = True
+        self.write_coil_publisher.publish(self.pub_msg)
+    
+    def hook_down(self):
+        """
+            Hook down
+        """
+        self.pub_msg.address = 0
+        self.pub_msg.value = False
+        self.write_coil_publisher.publish(self.pub_msg)
+    
     def light_off(self):
         light = [0,0,0,0,0,0]
         self.write_coils(light)
@@ -100,6 +119,9 @@ class LightControl():
             time.sleep(0.2)
             i=i+1
     
+    
+
+
     def light_type_7(self):
         """
             Blinking lines are on.
@@ -118,28 +140,28 @@ class LightControl():
         """
         light = [1,0,0,0,0,0,0,0]
         self.write_coils(light)
-        time.sleep(2)
-        light = [0,0,0,0,0,0,0,0]
-        self.write_coils(light)
-        time.sleep(2)
+        time.sleep(0.1)
         light = [0,1,0,0,1,0,0,0]
         self.write_coils(light)
-        time.sleep(2)
-        light = [0,0,0,0,0,0,0,0]
+        time.sleep(0.2)
+        light = [0,1,0,0,0,0,0,0]
         self.write_coils(light)
-        time.sleep(2)
-        light = [0,0,1,0,0,1,0,0]
+        time.sleep(0.2)
+        light = [0,0,0,0,1,0,0,0]
         self.write_coils(light)
-        time.sleep(2)
-        light = [0,0,0,0,0,0,0,0]
+        time.sleep(0.2)
+        light = [0,0,0,1,0,0,1,0]
         self.write_coils(light)
-        time.sleep(2)
-        light = [1,0,0,0,0,0,0,0]
+        time.sleep(0.2)
+        light = [0,0,0,1,0,0,0,0]
+        self.write_coils(light)
+        time.sleep(0.2)
+        light = [1,0,0,0,0,0,1,0]
         self.write_coils(light)
         time.sleep(0.1)
         light = [1,0,0,1,0,0,1,0]
         self.write_coils(light)
-        time.sleep(2)
+        time.sleep(0.2)
         light = [0,0,0,0,0,0,0,0]
         self.write_coils(light)
         time.sleep(2)

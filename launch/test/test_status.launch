@@ -1,6 +1,0 @@
-<?xml version="1.0"?>
-<launch>
-
-    <node pkg="camel_robot" name="robot_status" type="robot_status.py" output="screen"  required='true'/>
-
-</launch>
