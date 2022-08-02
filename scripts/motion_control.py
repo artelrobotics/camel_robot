@@ -13,6 +13,8 @@ from tf.transformations import euler_from_quaternion
 from math import radians, degrees, pi
 from ds4_driver.msg import Status, Feedback
 import PyKDL
+from obstacle_detector.msg import Obstacles 
+from std_msgs.msg import String
 
 class CamelControl():
 
@@ -24,16 +26,20 @@ class CamelControl():
         #rospy.Subscriber('/camel_amr_1000_001/odometry', Odometry, self.odom_callback)
         rospy.Subscriber('/camel_amr_1000_001/encoder/odom', Odometry, self.odom_callback)
         rospy.Subscriber('/camel_amr_1000_001/scan', LaserScan, self.laser_callback)
-        rospy.Subscriber('/camel_amr_1000_001/cmd_vel', Twist, self.cmd_callback)
+        
         #rospy.Subscriber('/camel_amr_1000_001/set_feedback', Feedback, self.obstacle_avoidance_callback)
-
+        rospy.Subscriber('/camel_amr_1000_001/sound_state', String, self.sound_callback)
+       
         #Initialize Service
         self.light_service = rospy.ServiceProxy("/camel_amr_1000_001/common/Light_server", light)
         self.sound_service = rospy.ServiceProxy("/camel_amr_1000_001/sound_server", sound)
         self.emergency_service = rospy.ServiceProxy("/camel_amr_1000_001/driver/emergency_stop_service", emergency_stop_srv)
         frequency = rospy.get_param('frequency', 20) # Get frequency in Hz default '10'
-        self.rate = rospy.Rate(60)  # Rate in Hz
-        
+        self.rate = rospy.Rate(20)  # Rate in Hz
+              
+  
+       
+      
       
         # Get angular tolarance for rotate function default " 1 degree"
       
@@ -49,7 +55,12 @@ class CamelControl():
         self.cmd_backward = False
         self.cmd_vel = Twist()
         time.sleep(1)
-        
+    
+    def sound_callback(self, msg):
+        self.last_sound = msg.data    
+    
+
+
     def publish_once_in_cmd_vel(self):
         """
         This is because publishing in topics sometimes fails the first time you publish.
@@ -92,8 +103,7 @@ class CamelControl():
         self.angular_z_velocity = msg.twist.twist.angular.z
        
     
-    def cmd_callback(self, msg):
-        self.cmd_vel = msg
+    
 
 
     # def aruco_pose(self):
@@ -227,6 +237,7 @@ class CamelControl():
             last_point_x = self.position.x
             last_point_y = self.position.y
             
+            
 
         self.stop_robot()
 
@@ -268,7 +279,7 @@ class CamelControl():
 
             turn_angle += delta_angle
             last_angle = rotation
-            
+          
         self.stop_robot()
 
     def quat_to_angle(self, quat):
@@ -293,5 +304,6 @@ if __name__ == '__main__':
     rospy.init_node('robot_control_node', anonymous=True)
     time.sleep(1)
     robotcontrol = CamelControl()
+   
 
     rospy.spin()

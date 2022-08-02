@@ -211,18 +211,17 @@
     <node pkg="camel_robot" name="robot_sound_service" type="robot_sound_service.py" output="$(arg output)"  required='true'/>
 
     <!-- DualShock4 -->
-    <node pkg="ds4_driver" type="ds4_driver_node.py" name="ds4_driver" output="screen" >
+    <node pkg="ds4_driver" type="ds4_driver_node.py" name="ds4_driver" output="$(arg output)" >
         <param name="backend" value="bluetooth" />
         <param name="device_addr" value="" />
         <param name="use_standard_msgs" value="false"/>
     </node>
-    <node pkg="ds4_driver" type="ds4_twist_node.py" name="ds4_twist" output="screen" >
+    <node pkg="ds4_driver" type="ds4_twist_node.py" name="ds4_twist" output="$(arg output)" >
         <rosparam command="load" file="$(find camel_robot)/config/bringup/ds4_2dof_config.yaml" />
         <param name="stamped" value="false" />
     </node>
 
     
-
 
     <!-- Multimaster -->
     <!-- Multimaster Discovery -->

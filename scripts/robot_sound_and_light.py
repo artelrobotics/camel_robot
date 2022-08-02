@@ -11,6 +11,7 @@ class Task_compleation:
 
     def __init__(self):
         """ Initialize node and Subscribes topics """
+        self.status = False   
         self.prev_data = 0
         #rospy.Subscriber('move_base/result', MoveBaseActionResult, self.task_finish_callback)
         rospy.Subscriber('move_base/status', GoalStatusArray, self.status_recieve_callback)
@@ -20,7 +21,8 @@ class Task_compleation:
         self.sound_service = rospy.ServiceProxy("sound_server", sound)
         self.rate = rospy.Rate(40)    
         self.button_status = False
-        self.button_pressed = False            
+        self.button_pressed = False
+                
         time.sleep(2)
         self.light_service("light_type_2")
         
@@ -62,6 +64,7 @@ class Task_compleation:
                 msg: MoveBaseActionGoal
             if goal recieved , It starts turn on motion sound and light
         """
+        data = None
         if msg.status_list != []:
             data = msg.status_list[0].status
         
@@ -69,7 +72,7 @@ class Task_compleation:
                 self.sound_service("sound_stop")
                 self.sound_service("motion")
                 self.light_service("light_type_2")
-                status = False
+                self.status = False
             elif data == 3 and data != self.prev_data:
                 self.sound_service("sound_stop")
                 self.button_pressed = False
@@ -77,7 +80,7 @@ class Task_compleation:
                 while self.button_pressed == False:
                         self.light_service("light_type_7")
                         time.sleep(0.2)
-                status = True
+                self.status = True
                 
                     
                 self.sound_service("sound_stop")
@@ -85,11 +88,11 @@ class Task_compleation:
                 self.light_service("light_type_2")
                 time.sleep(1)
             
-            else:
-                status = False
+            #else:
+            #    status = False
 
-            self.pub_task_comp.publish(status)
-            self.prev_data = data
+        self.pub_task_comp.publish(self.status)
+        self.prev_data = data
 
     def warning(self):
         

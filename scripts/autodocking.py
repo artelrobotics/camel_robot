@@ -28,12 +28,15 @@ import dynamic_reconfigure.client
 from dynamic_reconfigure import DynamicReconfigureCallbackException
 from camel_robot.srv import light
 
+import actionlib
 
+from camel_robot.msg import AutoDockingAction, AutoDockingFeedback, AutoDockingResult
 
 class Docking():
 
     def __init__(self):
         self.state = False
+        self.status = ""
         self.scan_obstacle = True
         self.stop = False
         self.charging = False
@@ -50,8 +53,9 @@ class Docking():
         #rospy.Subscriber("/camel_amr_1000_001/status", Status, self.cb_status, queue_size=1)
         self.rate = rospy.Rate(30)
         self.vel_publisher = rospy.Publisher('/camel_amr_1000_001/cmd_vel', Twist, queue_size=1)
-        self._as = rospy.Service('Docking_server', light, handler=self.docking_command)
-        
+    
+        self._as = actionlib.SimpleActionServer('Docking', AutoDockingAction, execute_cb=self.on_goal, auto_start=False)
+        self._as.start()
         # Subscribing to the topics Odometry and Scan
         
         rospy.Subscriber('/camel_amr_1000_001/scan', LaserScan, self.laser_callback)
@@ -66,6 +70,8 @@ class Docking():
         self.last_sound = msg.data    
         
     def cmd_callback(self, msg):
+        
+        
         if self.stop == True:
             self.cmd_vel.linear.x = 0
             self.cmd_vel.angular.z = 0
@@ -168,16 +174,21 @@ class Docking():
 
     def charging_yaw_correction(self, tolerance):
         
-        while(abs(self.station_yaw) > tolerance):
-                
-                angular_speed =  0.01 * self.station_yaw 
-                self.turn(angular_speed)
+        while(abs(self.station_yaw) > tolerance and self.preempted == False):
+            if self._as.is_preempt_requested():
+                self.preempted = True
+                break
+            angular_speed =  0.01 * self.station_yaw 
+            self.turn(angular_speed)
         self.rc.stop_robot()
     
     def charging_y_pose_correction(self):
         yaw_correction_task = False
         
-        while(yaw_correction_task == False):
+        while(yaw_correction_task == False and self.preempted == False):
+            if self._as.is_preempt_requested():
+                self.preempted = True
+                break
             summ_pose_y = 0
             for x in range(20):
                 summ_pose_y  = self.station_pose_y + summ_pose_y
@@ -204,8 +215,10 @@ class Docking():
     
     def move_charger(self):
         print("move charger")
-        while(abs(self.station_pose_x) > 1.3):
-           
+        while(abs(self.station_pose_x) > 1.3 and self.preempted == False):
+            if self._as.is_preempt_requested():
+                self.preempted = True
+                break
             self.cmd_vel.linear.x = -0.1
            
             self.cmd_vel.angular.z = - 0.5 * math.atan2(self.station_pose_y, abs(self.station_pose_x))
@@ -214,15 +227,27 @@ class Docking():
         self.rc.stop_robot()
 
     def yaw_correction(self, tolerance):
-        while(abs(self.yaw) > tolerance):
-                angular_speed = - 0.01 * self.yaw 
-                self.turn(angular_speed)
+        self.status = "Yaw_Correction"
+        self.send_feedback()
+        while(abs(self.yaw) > tolerance and self.preempted == False):
+            if self._as.is_preempt_requested():
+                self.preempted = True
+                break
+            
+            angular_speed = - 0.01 * self.yaw 
+            self.turn(angular_speed)
         self.rc.stop_robot()
         
     def y_pose_correction(self):
-        yaw_correction_task = False
+        self.status = "Y_Pose_Correction"
+        self.send_feedback()
         
-        while(yaw_correction_task == False):
+        yaw_correction_task = False
+        while(yaw_correction_task == False and self.preempted == False):
+            if self._as.is_preempt_requested():
+                self.preempted = True
+                break
+            
             summ_pose_y = 0
             for x in range(20):
                 summ_pose_y  = self.pose_y + summ_pose_y
@@ -248,7 +273,12 @@ class Docking():
                 avg_pose_y = 0
     
     def move_forward(self):
-        while(abs(self.pose_x) > 2.13):
+        self.status = "Move_Forward"
+        self.send_feedback()
+        while(abs(self.pose_x) > 2.13 and self.preempted == False):
+            if self._as.is_preempt_requested():
+                self.preempted = True
+                break
             self.cmd_vel.linear.x = 0.1
             #self.cmd_vel.angular.z = - 0.01 * self.yaw 
             self.cmd_vel.angular.z = 0.5 * math.atan2(self.pose_y, self.pose_x)
@@ -257,15 +287,25 @@ class Docking():
         self.rc.stop_robot()
 
     #def scan_correction(self):
+    def send_feedback(self):
+        feedback = AutoDockingFeedback()
+        feedback.feedback = self.status
+        self._as.publish_feedback(feedback)
 
-
-    def docking_command(self, command):
+    def on_goal(self, command):
+        self.success = False
+        self.preempted = False
+        invalid_parameters = False
+        self.message = ""
+        self.result.result = AutoDockingResult()
+        
+        
         self.yaw = 30
         self.station_yaw = 30
         self.state = True
         self.scan_obstacle = False
         
-        if(command.request_string == "loading"):
+        if(command.goal == "loading"):
             self.yaw_correction(1)
             self.y_pose_correction()
             self.move_forward()
@@ -289,11 +329,24 @@ class Docking():
                 self.lc_dr_client.update_configuration({'footprint': '[[-1.19,-0.9],[-1.19,0.9],[1.19,0.9],[1.19,-0.9]]'})
                 time.sleep(1)
             self.state = False
-            self.sound_service("sound_stop")
-            self.result = "Loading is succesfull"
+         
+            
+            if self.preempted:
+                rospy.loginfo("Preemted")
+                self.result.result = "Preemted" 
+                self._as.set_preempted(self.result)
+            elif self.success:
+                rospy.loginfo("Success")
+                self.result.result = "Success"
+                self._as.set_succeeded(self.result)
+            else:
+                rospy.loginfo("Aborted")
+                self.result.result = "Aborted"
+                self._as.set_aborted(self.result)
+                
         
         
-        elif(command.request_string == "unloading"):
+        elif(command.goal == "unloading"):
             self.hook_service(False)
             self.rc.move(-2.5)
             self.rc.rotate(180)
@@ -311,10 +364,9 @@ class Docking():
                 self.lc_dr_client.update_configuration({'footprint': '[[-1.19,-0.65],[-1.19,0.65],[1.19,0.65],[1.19,-0.65]]'})
                 time.sleep(1)
             self.state = False
-            self.result = "UnLoading is succesfull"
+            
 
-
-        elif(command.request_string == "charging"):
+        elif(command.goal == "charging"):
             self.charging = True
             self.charging_yaw_correction(1)
             self.charging_y_pose_correction()
@@ -324,14 +376,16 @@ class Docking():
             self.charging = False
             self.state = False
             
-            self.result = "Charging is succesfull"
-        
-        elif(command.request_string == "discharging"):
+            
+        elif(command.goal == "discharging"):
             self.rc.move(1)
             self.state = False
-            self.result = "Discharging is succesfull"
+            
+        else:
+            invalid_parameters = True
+            message = "Invalid command !!!"
 
-        return self.result
+        
 
 
 if __name__ == '__main__':

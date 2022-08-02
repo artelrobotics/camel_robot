@@ -6,17 +6,21 @@ import time
 from sound_play.msg import SoundRequest
 from camel_robot.srv import sound
 from sound_play.libsoundplay import SoundClient
+from std_msgs.msg import String
+
 import time
 class SoundService:
 
     def __init__(self):        
         self._as = rospy.Service('sound_server', sound, handler=self.sound_command)
         self.pub = rospy.Publisher('robotsound', SoundRequest, queue_size=1)
+        self.state_pub = rospy.Publisher('sound_state', String, queue_size=1)
         self.rate = rospy.Rate(10)
         self.sound_dir = '/home/nvidia/sounds/'
         self.result = sound()
         self.sound = SoundRequest()
         self.soundhandle = SoundClient()
+        self.last_sound = 'sound_stop'
 
         
     def on_start(self):
@@ -28,6 +32,13 @@ class SoundService:
         self.sound.arg2 = ''
         self.pub.publish(self.sound)
 
+    def sound_stop(self):
+        self.sound.sound = -1
+        self.sound.command = 0
+        self.sound.volume = 1.0
+        self.sound.arg = ''
+        self.sound.arg2 = ''
+        self.pub.publish(self.sound)
     def sound_command(self, command : str) -> str:
         """ Service handler recives sound command in string format
             
@@ -35,11 +46,14 @@ class SoundService:
         for sound playing
         """
         #Initialize command from service
+        self.sound_stop()
+        time.sleep(0.1)
         command = command.request_string
         
         #Stopping All playing sounds
         self.soundhandle.stopAll()
         
+
         
         #Playing a specific sound with command releted     
         
@@ -49,7 +63,7 @@ class SoundService:
             self.sound.volume = 0.05 #0.5
             self.sound.arg = self.sound_dir + 'beep.wav'
             self.sound.arg2 = ''
-
+            
             self.result = 'Sound type 3 is playing!'
             
         elif (command == "motion"):
@@ -141,7 +155,8 @@ class SoundService:
 
         # publishing sound command massage to Sound Node(/robosound)
         self.pub.publish(self.sound)
-        
+        self.state_pub.publish(self.last_sound)
+        self.last_sound = command
         # return result of the Service
         return self.result
         

@@ -29,7 +29,7 @@
         <param name="odom_frame"            value="$(arg robot_name)/odom"/>
         <param name="encoder_topic_name"   value="/$(arg robot_name)/driver/encoder_count" />
         <param name="command_srv"          value="/$(arg robot_name)/driver/dualchannel_command_service" />
-        <param name="publish_tf"           value="false" /> 
+        <param name="publish_tf"           value="true" /> 
     </node>
 
     <!-- DualShock4 -->

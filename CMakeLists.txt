@@ -14,6 +14,7 @@ find_package(catkin REQUIRED COMPONENTS
   std_msgs
   ethernet_remote_io_module
   message_generation
+  actionlib_msgs
 )
 
 ## System dependencies are found with CMake's conventions
@@ -67,17 +68,17 @@ add_message_files(
  )
 
 ## Generate actions in the 'action' folder
-# add_action_files(
-#   FILES
-#   Action1.action
-#   Action2.action
-# )
+ add_action_files(
+   FILES
+   AutoDocking.action
+ )
 
 ## Generate added messages and services with any dependencies listed here
 generate_messages(
    DEPENDENCIES
    sensor_msgs   
    std_msgs
+   actionlib_msgs
  )
 
 ################################################
@@ -167,7 +168,7 @@ include_directories(
 ## Mark executable scripts (Python etc.) for installation
 ## in contrast to setup.py, you can choose the destination
 catkin_install_python(PROGRAMS
-  scripts/hook_cntrl.py
+  
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 
@@ -211,11 +212,3 @@ catkin_install_python(PROGRAMS
 
 ## Add folders to be run by python nosetests
 # catkin_add_nosetests(test)
-
-add_executable(Light_service scripts/Light_service.cpp)
-target_link_libraries(Light_service ${catkin_LIBRARIES})
-add_dependencies(Light_service camel_robot_generate_messages_cpp)
-
-add_executable(Light_control_cpp scripts/Light_control_cpp.cpp)
-target_link_libraries(Light_control_cpp ${catkin_LIBRARIES})
-add_dependencies(Light_control_cpp camel_robot_generate_messages_cpp)

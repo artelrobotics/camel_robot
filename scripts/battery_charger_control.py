@@ -20,7 +20,7 @@ class Battery_and_Charger_Control:
         self.pub_msg = WriteCoil()    
         self.max_voltage_threshold = 3.47
         self.min_voltage_threshold = 3.42
-        self.min_warning_voltage = 2.9
+        self.min_warning_voltage = 2.8
         
     def bms_data_callback(self, msg: BatteryStatus):
         
@@ -40,7 +40,7 @@ class Battery_and_Charger_Control:
         level = msg.level
         charging = msg.is_charging
 
-        if (min_cell < self.min_warning_voltage and not charging and min_cell != 0):
+        if (min_cell < self.min_warning_voltage and charging == False  and min_cell != 0):
             self.sound_service("low_battery")
             self.light_service("light_type_7")
             time.sleep(30)
