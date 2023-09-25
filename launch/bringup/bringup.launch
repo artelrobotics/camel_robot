@@ -2,16 +2,16 @@
 <launch>
     <arg name="front_lidar_ip"        default="192.168.1.3" />
     <arg name="back_lidar_ip"         default="192.168.1.4" />
-    <arg name="common_modbus_ip"      default="192.168.1.111" />
+    <arg name="common_modbus_ip"      default="192.168.1.100" />
     <arg name="robot_name"            default="$(env ROBOT_NAME)" />
-    <arg name="base_frame"            default="base_link" />
+    <arg name="base_frame"            default="base_footprint" />
     <arg name="output"                default="screen" />
     <arg name="ws_port"               default="9090"/>
 
 
     <!-- Robot Description -->
     <param name="use_gui" value="false" />
-    <param name="robot_description" command="$(find xacro)/xacro '$(find camel_urdf)/urdf/CAMEL-1000.urdf.xacro'  robot_model:=$(arg robot_name)
+    <param name="robot_description" command="$(find xacro)/xacro '$(find camel_urdf)/urdf/CAMEL-500.urdf.xacro'  robot_model:=$(arg robot_name)
     base_frame:=$(arg base_frame)"/>
 
     <!-- Joint State -->
@@ -32,13 +32,13 @@
 
     <!-- I/O module -->
     <!-- for common i/o  -->
-    <node pkg="camel_robot" name="modbus" type="modbus.py" output="$(arg output)" ns="common" required='true'>
+    <!-- <node pkg="ethernet_remote_io_module" name="modbus" type="modbus_node.py" output="$(arg output)" ns="common" required='true'>
         <param name="ip_address" value="$(arg common_modbus_ip)"/>
         <param name="port" value="502"/>
         <param name="rate" value="10"/>
-    </node> 
+    </node>  -->
 
-    <!-- Roboteq drivers -->
+    <!-- drivers -->
     <include file="$(find camel_robot)/launch/bringup/drivers.launch">
         <arg name="robot_name"            value="$(env ROBOT_NAME)" />
         <arg name="base_frame"            value="$(arg base_frame)" />
@@ -53,6 +53,17 @@
         <arg name="output"                value="$(arg output)" />
     </include>
     
+    <!-- Depth Image to Laser Scan Node -->
+    <node name="depthimage_to_laserscan" pkg="depthimage_to_laserscan" type="depthimage_to_laserscan" args="">
+        <remap from="image"       to="/$(arg robot_name)/front/zed2/depth/depth_registered"/> 
+        <remap from="camera_info" to="/$(arg robot_name)/front/zed2/depth/camera_info"/> 
+        <param name="scan_height"     type="int"    value="80"/>
+        <param name="scan_time"       type="double" value="0.066"/> 
+        <param name="range_min"       type="double" value="0.05"/> 
+        <param name="range_max"       type="double" value="2.0"/> 
+        <param name="output_frame_id" type="str"    value="$(arg robot_name)/zed_front_camera_center"/> 
+        <remap from="scan"            to="/$(arg robot_name)/depth/scan"/> 
+    </node>
 
     <!-- EKF Robot Localization -->
     <node pkg="robot_localization" type="ekf_localization_node" name="ekf_se" clear_params="true" output="$(arg output)">
@@ -74,30 +85,16 @@
     </node>
 
 
-    <!-- Hooks Control-->
-    <node pkg="camel_robot" name="hook" type="hook_cntrl.py" output="$(arg output)"  required='true' ns="common"/>
-
-    <!-- Light Control-->
-    <node pkg="camel_robot" name="light_control" type="Light_control.py" output="$(arg output)"  required='true' ns="common"/>
-    
-    <!-- Light Service-->   
-    <node pkg="camel_robot" name="light_service" type="Light_service.py" output="$(arg output)"  required='true' ns="common"/>
-
-    <!-- Robot Status-->
-    <node pkg="camel_robot" name="robot_status" type="robot_status.py" output="$(arg output)"  required='true'/>
-
-
-
     <!-- Multimaster -->
     <!-- Multimaster Discovery -->
-    <node name="master_discovery" pkg="fkie_master_discovery" type="master_discovery" output="$(arg output)">
+    <!-- <node name="master_discovery" pkg="fkie_master_discovery" type="master_discovery" output="$(arg output)">
         <rosparam command="load" file="$(find camel_robot)/config/bringup/master_disc_config.yaml"/>
-    </node>
+    </node> -->
 
     <!-- Multimaster Sync -->
-    <node name="master_sync" pkg="fkie_master_sync" type="master_sync" output="$(arg output)">
+    <!-- <node name="master_sync" pkg="fkie_master_sync" type="master_sync" output="$(arg output)">
         <rosparam command="load" file="$(find camel_robot)/config/bringup/master_sync_config.yaml"/>
-    </node>
+    </node> -->
     
     
     <!-- Rosbridge Websocket -->

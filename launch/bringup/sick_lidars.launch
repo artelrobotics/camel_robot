@@ -5,12 +5,12 @@
     <arg name="robot_name"            default="$(env ROBOT_NAME)" />
     <arg name="base_frame"            default="base_link" />
     <arg name="output"                default="screen" />
-    <arg name="pub_joints"            default="true" />
+    <arg name="pub_joints"            default="false" />
 
     <group if="$(arg pub_joints)">
         <!-- Robot Description -->
         <param name="use_gui" value="false" />
-        <param name="robot_description" command="$(find xacro)/xacro '$(find camel_urdf)/urdf/CAMEL-1000.urdf.xacro'  robot_model:=$(arg robot_name)
+        <param name="robot_description" command="$(find xacro)/xacro '$(find camel_urdf)/urdf/CAMEL-500.urdf.xacro'  robot_model:=$(arg robot_name)
         base_frame:=$(arg base_frame)"/>
 
         <!-- Joint State -->
@@ -37,8 +37,8 @@
         <param name="activate_lidoutputstate" type="bool" value="false"/> 
         <param name="activate_lidinputstate" type="bool" value="false"/> 
         <param name="min_intensity" type="double" value="0.0"/> 
-
-        
+        <param name="ang_res" type="double" value="0.25"  />
+        <param name="scan_freq" type="double" value="25" /> 
     </node>
 
     <!-- Back Lidar -->
