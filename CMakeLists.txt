@@ -12,7 +12,7 @@ find_package(catkin REQUIRED COMPONENTS
   rospy
   sensor_msgs
   std_msgs
-  ethernet_remote_io_module
+  ##ethernet_remote_io_module
   message_generation
   actionlib_msgs
 )
