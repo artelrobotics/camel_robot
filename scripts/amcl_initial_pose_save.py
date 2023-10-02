@@ -24,14 +24,14 @@ if __name__ == "__main__":
                     pose['initial_pose_x'] = rospy.get_param("amcl/initial_pose_x")
                 if rospy.has_param("amcl/initial_pose_y"):
                     pose['initial_pose_y'] = rospy.get_param("amcl/initial_pose_y")
-                
+
                 with open(file_path, 'w') as file:
                     yaml.dump(pose, file, default_flow_style=False)
-                
+
         except Exception as e:
             file.close()
             rospy.logwarn(e)
-            
+
         r.sleep()
     else:
         file.close()

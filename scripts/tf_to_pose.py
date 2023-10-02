@@ -1,62 +1,55 @@
 #!/usr/bin/env python
 import rospy
-from geometry_msgs.msg import PoseStamped
-import tf
-from tf import LookupException, ExtrapolationException
+from geometry_msgs.msg import TransformStamped, PoseStamped
+import tf2_ros
+import tf2_geometry_msgs
+import sys
 
-class Tf_to_Pose:
+class TfToPose:
     def __init__(self):
-        self.tf_listener = tf.TransformListener()
+        self.tf_buffer = tf2_ros.Buffer()
+        self.tf_listener = tf2_ros.TransformListener(self.tf_buffer)
         self.freq = rospy.get_param("~rate", default=1)
         self.rate = rospy.Rate(self.freq)
-        self.frame_id = ""
         self.pose_pub = rospy.Publisher("robot_pose", PoseStamped, queue_size=1)
         self.child_frame = rospy.get_param("~child_frame", default="base_footprint")
-        self.parrent_frame = rospy.get_param("~parrent_frame", default="map")
-        self.pose_msg = PoseStamped()
-    
-    def check_frames_exist(self, frame):
-        if self.tf_listener.frameExists(frame):
-            return True
+        self.parent_frame = rospy.get_param("~parent_frame", default="map")
+        self.transform_tolerance = rospy.get_param('~transform_tolerance', default=0.5)
+
+    def get_transform(self, target_frame, source_frame) -> TransformStamped:
+        try:
+            can_transform = self.tf_buffer.can_transform(target_frame, source_frame, rospy.Time(), rospy.Duration(1.0))
+            if can_transform:
+                transform: TransformStamped = self.tf_buffer.lookup_transform(target_frame, source_frame, rospy.Time())
+                if not (rospy.Time.now() - rospy.Duration(self.transform_tolerance)) > transform.header.stamp:
+                    return transform
+                else:
+                    return None
+            else:
+                return None
+        except tf2_ros.TransformException as ex:
+            rospy.logerr(f"Transform exception: {ex}")
+            return None
+
+    def get_pose(self) -> PoseStamped:
+        transform = self.get_transform(self.child_frame, self.parent_frame)
+        if transform is not None:
+            pose_stamped = tf2_geometry_msgs.do_transform_pose(PoseStamped(), transform)
+            return pose_stamped
         else:
-            rospy.logerr_once("frame {frame} doesn't exist".format(frame=frame))
-            return False
+            return None
 
-    def wait_for_transform(self, time):
-        if self.check_frames_exist(self.parrent_frame) and self.check_frames_exist(self.child_frame):
-            self.tf_listener.waitForTransform(self.parrent_frame, self.child_frame, time, rospy.Duration(10.0))
-        else:
-            pass
-    
-    def get_pose(self):
-        self.wait_for_transform(time=rospy.Time())
-        while not rospy.is_shutdown():
-            try:
-                now = rospy.Time.now()
-                self.wait_for_transform(time=now)
-                translation, rotation = self.tf_listener.lookupTransform(self.parrent_frame, self.child_frame, now)
-
-                self.pose_msg.header.frame_id = self.parrent_frame
-                self.pose_msg.header.stamp = rospy.Time.now()
-                self.pose_msg.pose.position.x = translation[0]
-                self.pose_msg.pose.position.y = translation[1]
-                self.pose_msg.pose.position.z = 0.0
-                self.pose_msg.pose.orientation.x = 0.0
-                self.pose_msg.pose.orientation.y = 0.0
-                self.pose_msg.pose.orientation.z = rotation[2]
-                self.pose_msg.pose.orientation.w = rotation[3]
-
-                self.pose_pub.publish(self.pose_msg)
-                self.rate.sleep()
-
-            except LookupException as e:
-                rospy.logerr_once(e)
-
-            except ExtrapolationException as e:
-                rospy.logerr_once(e)
+    def publish_pose(self):
+        msg = self.get_pose()
+        if msg is not None:
+            self.pose_pub.publish(msg)
 
 if __name__ == "__main__":
     rospy.init_node("tf_to_pose")
-    pose = Tf_to_Pose()
-    pose.get_pose()
-    rospy.spin()
+    robot_pose = TfToPose()
+    try:
+        while not rospy.is_shutdown():
+            robot_pose.publish_pose()
+            robot_pose.rate.sleep()
+    except rospy.ROSInterruptException:
+        pass

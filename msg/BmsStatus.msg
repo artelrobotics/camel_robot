@@ -1,4 +1,2 @@
-string[] status_flag
-string[] fault_flag
-string battery
-bool charging
+float64 battery_percentage
+string is_charging

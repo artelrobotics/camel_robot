@@ -1,3 +1,0 @@
-frequency: 10 # Hz
-aruco_id: 0 
-angular_tolerance: 0.1745 # Radians

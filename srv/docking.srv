@@ -1,4 +1,0 @@
-int16 ar_marker_id
----
-string message
-bool result
