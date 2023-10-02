@@ -1,0 +1,6 @@
+fiducial_len: 0.14
+dictionary: 0
+ignore_fiducials: ""
+fiducial_len_override:
+  1: 0.10
+  2: 0.025

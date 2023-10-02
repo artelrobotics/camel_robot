@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<launch>
+    <arg name="serial_port"           default="/dev/ttyDalyBMS" />
+    <arg name="output"                default="log" />
+
+    <!-- bms -->
+    <node pkg="daly_bms" type="daly_bms_node.py" name="daly_bms" output="$(arg output)"  required='true'>
+	    <param name="serial_port" value="$(arg serial_port)"/>
+    </node>
+</launch>

@@ -16,6 +16,4 @@
         <param name="general/gpu_id"                    value="-1" />
         <param name="general/serial_number"             value="" />
     </node>
-
-
 </launch>

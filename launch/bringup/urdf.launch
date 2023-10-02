@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<launch>
+    <arg name="robot_name"            default="$(env ROBOT_NAME)" />
+    <arg name="base_frame"            default="base_footprint" />
+    <arg name="output"                default="screen" />
+
+    <!-- Robot Description -->
+    <param name="use_gui" value="false" />
+    <param name="robot_description" command="$(find xacro)/xacro '$(find camel_urdf)/urdf/CAMEL-500.urdf.xacro'  robot_model:=$(arg robot_name)
+    base_frame:=$(arg base_frame)"/>
+
+    <!-- Joint State -->
+    <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher" respawn="true" output="$(arg output)"/>
+    <!-- Robot State  -->
+    <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" respawn="true" output="$(arg output)"/>
+</launch>

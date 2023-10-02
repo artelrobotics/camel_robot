@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+
+<launch>
+  <arg name="robot_name"               default="$(env ROBOT_NAME)" />
+  <arg name="output"                   default="screen" />
+  <arg name="transport"                default="compressed"/>
+  <arg name="do_pose_estimation"       default="true"/>
+  <arg name="vis_msgs"                 default="false"/>
+  <arg name="verbose"                  default="false"/>
+  <arg name="camera"                   default="/$(arg robot_name)/front/zed2/rgb/image_rect_color/compressed"/>
+  <arg name="camera_info"              default="/$(arg robot_name)/front/zed2/rgb/camera_info"/>
+
+  <node pkg="aruco_detect" name="aruco_detect" type="aruco_detect" output="screen" respawn="false">
+    <param name="image_transport"              value="$(arg transport)"/>
+    <param name="publish_images"               value="true" />
+    <param name="do_pose_estimation"           value="$(arg do_pose_estimation)"/>
+    <param name="vis_msgs"                     value="$(arg vis_msgs)"/>
+    <param name="verbose"                      value="$(arg verbose)"/>
+    <remap from="camera/compressed"            to="$(arg camera)"/>
+    <remap from="camera_info"                  to="$(arg camera_info)"/>
+    <rosparam file="$(find camel_robot)/config/bringup/aruco_config.yaml"  command="load"/>
+  </node>
+</launch>

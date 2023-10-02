@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+
+<launch>
+    <arg name="robot_name"                    default="$(env ROBOT_NAME)" />
+    <arg name="base_frame"                    default="base_link" />
+    <arg name="output"                        default="screen" />
+    <arg name="odom_frame"                    default="odom"/>
+    <arg name="marker_frame"                  default="fiducial_1"/>
+    <arg name="interval"                      default="0.05"/>
+    <arg name="transform_tolerance"           default="0.5"/>
+    <arg name="freq"                          default="10.0"/>
+
+    <node name="docking_path_planner"  pkg="docking_server" type="docking_path_planner.py" output="$(arg output)" required='true'>
+        <param name="marker_frame"        value="$(arg marker_frame)"/>
+        <param name="robot_frame"         value="$(arg robot_name)/$(arg base_frame)"/>
+        <param name="world_frame"         value="$(arg robot_name)/$(arg odom_frame)"/>
+        <param name="interval"            value="$(arg interval)"/>
+        <param name="transform_tolerance" value="$(arg transform_tolerance)"/>
+        <param name="freq"                value="$(arg freq)"/>
+    </node>
+
+    <node name="docking_as"  pkg="docking_server" type="docking_as.py" output="$(arg output)" required='true'> </node>
+
+</launch>

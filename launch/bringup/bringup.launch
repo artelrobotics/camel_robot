@@ -1,69 +1,104 @@
 <?xml version="1.0"?>
 <launch>
-    <arg name="front_lidar_ip"        default="192.168.1.3" />
-    <arg name="back_lidar_ip"         default="192.168.1.4" />
-    <arg name="common_modbus_ip"      default="192.168.1.100" />
     <arg name="robot_name"            default="$(env ROBOT_NAME)" />
+    <arg name="ds4"                   default="$(env DS4)" />
     <arg name="base_frame"            default="base_footprint" />
     <arg name="output"                default="screen" />
+    <arg name="front_lidar_ip"        default="192.168.1.3" />
+    <arg name="back_lidar_ip"         default="192.168.1.4" />
+    <arg name="io_port"               default="/dev/ttyIOModule"/>
+    <arg name="bms_port"              default="/dev/ttyDalyBMS"/>
+    <arg name="driver_port"           default="/dev/ttyRoboteqDriver"/>
     <arg name="ws_port"               default="9090"/>
 
 
-    <!-- Robot Description -->
-    <param name="use_gui" value="false" />
-    <param name="robot_description" command="$(find xacro)/xacro '$(find camel_urdf)/urdf/CAMEL-500.urdf.xacro'  robot_model:=$(arg robot_name)
-    base_frame:=$(arg base_frame)"/>
-
-    <!-- Joint State -->
-    <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher" respawn="true" output="$(arg output)"/>
-    <!-- Robot State  -->
-    <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" respawn="true" output="$(arg output)"/>
+    <!-- URDF launch -->
+    <include file="$(find camel_robot)/launch/bringup/urdf.launch">
+        <arg name="robot_name"            value="$(arg robot_name)" />
+        <arg name="base_frame"            value="$(arg base_frame)" />
+        <arg name="output"                value="$(arg output)" />
+    </include>
 
 
-    <!-- SICK lidars launch -->
+    <!-- SICK lidars & Scans Merger launch -->
     <include file="$(find camel_robot)/launch/bringup/sick_lidars.launch">
         <arg name="front_lidar_ip"        value="$(arg front_lidar_ip)" />
         <arg name="back_lidar_ip"         value="$(arg back_lidar_ip)" />
-        <arg name="robot_name"            value="$(env ROBOT_NAME)" />
-        <arg name="base_frame"            value="$(arg base_frame)" />
-        <arg name="output"                value="$(arg output)" />
-    </include>
-    
-
-    <!-- I/O module -->
-    <!-- for common i/o  -->
-    <!-- <node pkg="ethernet_remote_io_module" name="modbus" type="modbus_node.py" output="$(arg output)" ns="common" required='true'>
-        <param name="ip_address" value="$(arg common_modbus_ip)"/>
-        <param name="port" value="502"/>
-        <param name="rate" value="10"/>
-    </node>  -->
-
-    <!-- drivers -->
-    <include file="$(find camel_robot)/launch/bringup/drivers.launch">
-        <arg name="robot_name"            value="$(env ROBOT_NAME)" />
-        <arg name="base_frame"            value="$(arg base_frame)" />
+        <arg name="robot_name"            value="$(arg robot_name)" />
         <arg name="output"                value="$(arg output)" />
     </include>
 
 
-    <!-- ZED Cameras -->
-    <include file="$(find camel_robot)/launch/bringup/zed_cameras.launch">
-        <arg name="robot_name"            value="$(env ROBOT_NAME)" />
+    <!-- I/O module launch -->
+    <include file="$(find camel_robot)/launch/bringup/io_module.launch">
+        <arg name="port"        value="$(arg io_port)"/>
+	    <arg name="baudrate"    value="9600"/>
+        <arg name="output"      value="$(arg output)" />
+    </include>
+
+
+    <!-- DalyBMS launch -->
+    <include file="$(find camel_robot)/launch/bringup/bms.launch">
+        <arg name="serial_port"           value="$(arg bms_port)" />
+        <arg name="output"                value="$(arg output)" />
+    </include>
+
+
+    <!-- Roboteq Driver & Encoder launch -->
+    <include file="$(find camel_robot)/launch/bringup/motordriver.launch">
+        <arg name="output"                value="$(arg output)" />
+        <arg name="robot_name"            value="$(arg robot_name)" />
+        <arg name="base_frame"            value="$(arg base_frame)" />
+        <arg name="serial_port"           value="$(arg driver_port)" />
+    </include>
+
+
+    <!-- Joystick launch -->
+    <include file="$(find camel_robot)/launch/bringup/joystick.launch">
+        <arg name="ds4"                   value="$(arg ds4)" />
+        <arg name="output"                value="$(arg output)" />
+    </include>
+
+
+    <!-- ZED Camera launch -->
+    <include file="$(find camel_robot)/launch/bringup/zed_camera.launch">
+        <arg name="robot_name"            value="$(arg robot_name)" />
         <arg name="base_frame"            value="$(arg base_frame)" />
         <arg name="output"                value="$(arg output)" />
     </include>
-    
+
+
     <!-- Depth Image to Laser Scan Node -->
     <node name="depthimage_to_laserscan" pkg="depthimage_to_laserscan" type="depthimage_to_laserscan" args="">
-        <remap from="image"       to="/$(arg robot_name)/front/zed2/depth/depth_registered"/> 
-        <remap from="camera_info" to="/$(arg robot_name)/front/zed2/depth/camera_info"/> 
-        <param name="scan_height"     type="int"    value="80"/>
-        <param name="scan_time"       type="double" value="0.066"/> 
-        <param name="range_min"       type="double" value="0.05"/> 
-        <param name="range_max"       type="double" value="2.0"/> 
-        <param name="output_frame_id" type="str"    value="$(arg robot_name)/zed_front_camera_center"/> 
-        <remap from="scan"            to="/$(arg robot_name)/depth/scan"/> 
+        <remap from="image"             to="/$(arg robot_name)/front/zed2/depth/depth_registered"/>
+        <remap from="camera_info"       to="/$(arg robot_name)/front/zed2/depth/camera_info"/>
+        <param name="scan_height"       type="int"    value="60"/>
+        <param name="scan_time"         type="double" value="0.066"/>
+        <param name="range_min"         type="double" value="0.05"/>
+        <param name="range_max"         type="double" value="2.0"/>
+        <param name="output_frame_id"   type="str"    value="$(arg robot_name)/zed_front_camera_center"/>
+        <remap from="scan"              to="/$(arg robot_name)/depth/scan"/>
     </node>
+
+
+    <!-- Aruco detector launch -->
+    <include file="$(find camel_robot)/launch/bringup/aruco_detect.launch">
+        <arg name="robot_name"              value="$(arg robot_name)" />
+        <arg name="output"                  value="$(arg output)" />
+        <arg name="camera"                  value="/$(arg robot_name)/front/zed2/rgb/image_rect_color/compressed"/>
+        <arg name="camera_info"             value="/$(arg robot_name)/front/zed2/rgb/camera_info"/>
+    </include>
+
+
+    <!-- Docking launch -->
+    <include file="$(find camel_robot)/launch/bringup/docking.launch">
+        <arg name="robot_name"              value="$(arg robot_name)" />
+        <arg name="output"                  value="$(arg output)" />
+        <arg name="marker_frame"            value="fiducial_1"/>
+        <arg name="base_frame"              value="base_link" />
+        <arg name="odom_frame"              value="odom"/>
+    </include>
+
 
     <!-- EKF Robot Localization -->
     <node pkg="robot_localization" type="ekf_localization_node" name="ekf_se" clear_params="true" output="$(arg output)">
@@ -73,12 +108,12 @@
         <param name="base_link_frame" value="$(arg robot_name)/$(arg base_frame)"/>
         <param name="world_frame" value="$(arg robot_name)/odom"/>
 
-        <param name="odom0" value="/$(arg robot_name)/encoder/odom"/> 
+        <param name="odom0" value="/$(arg robot_name)/encoder/odom"/>
         <param name="odom0_queue_size" value="2"/>
 
-        <param name="imu0" value="/$(arg robot_name)/front/zed/imu/data"/> 
+        <param name="imu0" value="/$(arg robot_name)/front/zed2/imu/data"/>
         <param name="imu0_queue_size" value="5"/>
-    
+
         <remap from="/$(arg robot_name)/odometry/filtered" to="/$(arg robot_name)/odometry"/>
         <remap from="/$(arg robot_name)/accel/filtered" to="/$(arg robot_name)/accel"/>
 
@@ -87,26 +122,29 @@
 
     <!-- Multimaster -->
     <!-- Multimaster Discovery -->
-    <!-- <node name="master_discovery" pkg="fkie_master_discovery" type="master_discovery" output="$(arg output)">
+    <node name="master_discovery" pkg="fkie_master_discovery" type="master_discovery" output="$(arg output)">
         <rosparam command="load" file="$(find camel_robot)/config/bringup/master_disc_config.yaml"/>
-    </node> -->
+    </node>
 
     <!-- Multimaster Sync -->
-    <!-- <node name="master_sync" pkg="fkie_master_sync" type="master_sync" output="$(arg output)">
+    <node name="master_sync" pkg="fkie_master_sync" type="master_sync" output="$(arg output)">
         <rosparam command="load" file="$(find camel_robot)/config/bringup/master_sync_config.yaml"/>
-    </node> -->
-    
-    
+    </node>
+
+
     <!-- Rosbridge Websocket -->
     <node name="rosbridge_websocket" pkg="rosbridge_server" type="rosbridge_websocket" output="$(arg output)">
         <rosparam command="load" file="$(find camel_robot)/config/bringup/rosbridge_ws_config.yaml"/>
         <param name="port" value="$(arg ws_port)"/>
-        <param name="address" value="$(env HOSTNAME)"/>
+        <param name="address" value="$(env ROS_IP)"/>
         <rosparam command="load" file="$(find camel_robot)/config/bringup/rosbridge_glob_config.yaml"/>
     </node>
 
     <node name="rosapi" pkg="rosapi" type="rosapi_node" output="$(arg output)">
         <rosparam command="load" file="$(find camel_robot)/config/bringup/rosbridge_glob_config.yaml"/>
     </node>
+
+    <!-- TF Web republisher -->
+    <node name="tf2_web_republisher" pkg="tf2_web_republisher" type="tf2_web_republisher" output="$(arg output)"/>
 
 </launch>

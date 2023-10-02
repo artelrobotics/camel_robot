@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<launch>
+    <arg name="ds4"                   default="$(env DS4)" />
+    <arg name="output"                default="screen" />
+
+    <!-- DualShock4 -->
+    <group if="$(eval ds4 == 'true')">
+        <node pkg="ds4_driver" type="ds4_driver_node.py" name="ds4_joystick" output="$(arg output)" >
+            <param name="backend" value="bluetooth" />
+            <param name="device_addr" value="" />
+            <param name="use_standard_msgs" value="false"/>
+        </node>
+        <node pkg="ds4_driver" type="ds4_twist_node.py" name="ds4_twist" output="$(arg output)" >
+            <rosparam command="load" file="$(find camel_robot)/config/bringup/ds4_2dof_config.yaml" />
+            <param name="stamped" value="false" />
+        </node>
+    </group>
+
+    <group if="$(eval ds4 == 'false')">
+        <node pkg="arobotics_joystick" type="joy_to_robot.py" name="gamepad" output="screen" >
+            <rosparam command="load" file="$(find camel_robot)/config/bringup/joystick_config.yaml" />
+        </node>
+    </group>
+
+</launch>
