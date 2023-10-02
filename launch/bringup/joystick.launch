@@ -18,7 +18,9 @@
 
     <group if="$(eval ds4 == 'false')">
         <node pkg="arobotics_joystick" type="joy_to_robot.py" name="gamepad" output="screen" >
-            <rosparam command="load" file="$(find camel_robot)/config/bringup/joystick_config.yaml" />
+            <rosparam command="load"                                file="$(find camel_robot)/config/bringup/joystick_config.yaml" />
+            <param name="emergency_stop/service_name"   type="str"  value="$(arg robot_name)/driver/emergency_stop_service" />
+            <param name="hooks/service_name"            type="str"  value="$(arg robot_name)/hooks_service/hooks_ctrl" />
         </node>
     </group>
 

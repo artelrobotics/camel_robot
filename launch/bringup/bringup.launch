@@ -120,6 +120,16 @@
     </node>
 
 
+    <!-- Hooks Control -->
+    <node pkg="camel_robot" type="hook_service.py" name="hooks_service" output="$(arg output)">
+        <param name="hook_pin" type="int" value="1"/>
+    </node>
+
+
+    <!-- Robot Status -->
+    <node pkg="camel_robot" type="robot_status.py" name="robot_status" output="$(arg output)" />
+
+
     <!-- Multimaster -->
     <!-- Multimaster Discovery -->
     <node name="master_discovery" pkg="fkie_master_discovery" type="master_discovery" output="$(arg output)">
