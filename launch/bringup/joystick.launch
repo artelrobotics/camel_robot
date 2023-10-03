@@ -2,9 +2,10 @@
 <launch>
     <arg name="ds4"                   default="$(env DS4)" />
     <arg name="output"                default="screen" />
+    <arg name="robot_name"            default="$(env ROBOT_NAME)" />
 
     <!-- DualShock4 -->
-    <group if="$(eval ds4 == 'true')">
+    <group if="$(arg ds4)">
         <node pkg="ds4_driver" type="ds4_driver_node.py" name="ds4_joystick" output="$(arg output)" >
             <param name="backend" value="bluetooth" />
             <param name="device_addr" value="" />
@@ -16,7 +17,7 @@
         </node>
     </group>
 
-    <group if="$(eval ds4 == 'false')">
+    <group unless="$(arg ds4)">
         <node pkg="arobotics_joystick" type="joy_to_robot.py" name="gamepad" output="screen" >
             <rosparam command="load"                                file="$(find camel_robot)/config/bringup/joystick_config.yaml" />
             <param name="emergency_stop/service_name"   type="str"  value="$(arg robot_name)/driver/emergency_stop_service" />

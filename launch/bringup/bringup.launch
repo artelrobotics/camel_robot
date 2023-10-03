@@ -57,6 +57,7 @@
     <include file="$(find camel_robot)/launch/bringup/joystick.launch">
         <arg name="ds4"                   value="$(arg ds4)" />
         <arg name="output"                value="$(arg output)" />
+        <arg name="robot_name"            value="$(arg robot_name)" />
     </include>
 
 
