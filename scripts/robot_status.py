@@ -5,7 +5,7 @@ from std_msgs.msg import String
 from robotnik_msgs.msg import BatteryStatus
 from camel_robot.msg import RobotStatus, DriverStatus, BmsStatus
 from actionlib_msgs.msg import GoalStatusArray
-from roboteq_motor_controller_driver.msg import channel_values
+from roboteq_driver.msg import channel_values
 
 def check_states(status_names, state):
     """[Finding status name from binary array]
@@ -66,8 +66,8 @@ def status_flags_callback(value):
 
 
 def bms_data_callback(data):
-    robot_status.battery_percentage = round(data.level, 2)
-    robot_status.bms_status.charging = str(data.is_charging)
+    robot_status.bms_status.battery_percentage = round(data.level, 2)
+    robot_status.bms_status.is_charging = str(data.is_charging)
     status_pub.publish(robot_status)
 
 
