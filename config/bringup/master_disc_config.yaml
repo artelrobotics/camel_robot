@@ -9,7 +9,7 @@ measurement_intervals: 5
 timeout_factor: 10
 remove_after: 300
 active_request_after: 60
-robot_hosts: ["neo-pc"]
+# robot_hosts: ["neo-pc"]
 change_notification_count: 3
 send_mcast: true
 listen_mcast: true
