@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+
+<launch>
+    <!-- ****************** Arguments ******************** -->
+    <arg name="robot_name"            default="$(env ROBOT_NAME)" />
+    <arg name="output"                default="log" />
+    <arg name="with_virtual_walls"    default="false" doc="Enables usage of virtual walls when set. Set to false when running SLAM." />
+    <arg name="map_name"              default=""/>
+    <arg name="navigation_map_file"   default="$(find camel_robot)/maps/$(arg map_name).yaml"/>
+    <arg name="virtual_map_file"      default="$(find camel_robot)/maps/$(arg map_name)_virtual.yaml"/>
+
+    <!-- ************************ Map Server ************************* -->
+    <node name="map_server" pkg="map_server" type="map_server" args="$(arg navigation_map_file)" required='true' output="$(arg output)">
+        <param name="frame_id" value="$(arg robot_name)/map"/>
+    </node>
+
+    <!-- ************************ Virtual Map Server ************************* -->
+    <group if="$(arg with_virtual_walls)">
+        <node name="virtual_map_server" pkg="map_server" type="map_server" args="$(arg virtual_map_file)" required='true' output="$(arg output)">
+            <param name="frame_id" value="$(arg robot_name)/map"/>
+            <remap from="map" to="virtual_map"/>
+        </node>
+    </group>
+</launch>

@@ -7,10 +7,19 @@ GlobalPlanner:                                  # Also see: http://wiki.ros.org/
   use_quadratic: true                           # Use the quadratic approximation of the potential. Otherwise, use a simpler calculation, default true
   use_grid_path: false                          # Create a path that follows the grid boundaries. Otherwise, use a gradient descent method, default false
   old_navfn_behavior: false                     # Exactly mirror behavior of navfn, use defaults for other boolean parameters, default false
-  lethal_cost: 250 #252
-  neutral_cost: 50 #60
-  cost_factor: 0.8 #0.55
-  publish_potential: false
+  lethal_cost: 253
+  neutral_cost: 140 #140 #66 # 50
+  cost_factor: 0.55 #3.085
+  publish_potential: true
   orientation_mode: 0
   orientation_window_size: 1
-  outline_map: false
+  outline_map: true
+
+
+
+
+
+
+  
+  
+

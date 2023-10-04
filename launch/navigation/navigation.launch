@@ -1,33 +1,54 @@
 <?xml version="1.0"?>
 
 <launch>
-    <group ns="$(arg robot_name)">
-        <arg name="robot_name"            default="$(env ROBOT_NAME)" />
-        <arg name="base_frame"            default="base_link" />
-        <arg name="output"                default="screen" />
-        <!-- ****************** Arguments ******************** -->
-        <arg name="map_file" default="$(find camel_robot)/maps/map.yaml"/>
+    <!-- ****************** Arguments ******************** -->
+    <arg name="robot_name"            default="$(env ROBOT_NAME)" />
+    <arg name="base_frame"            default="base_footprint" />
+    <arg name="output"                default="log" />
+    <arg name="local_planner_type"    default="teb"   doc="[base, dwa, teb]"/>
+    <arg name="with_virtual_walls"    default="false"  doc="Enables usage of virtual walls when set. Set to false when running SLAM." />
+    <arg name="map_name"              default=""/>
+    <arg name="global_planner"        default="false" />
 
-        <!-- ************************ Map Server ************************* -->
-        <node name="map_server" pkg="map_server" type="map_server" args="$(arg map_file)" respawn="true">
-        <param name="frame_id" value="$(arg robot_name)/map"/>
-        </node>
+    <!-- ************************ Map Server ************************* -->
+    <include file="$(find camel_robot)/launch/navigation/map_server.launch">
+        <arg name="robot_name"            value="$(arg robot_name)" />
+        <arg name="output"                value="$(arg output)" />
+        <arg name="with_virtual_walls"    value="$(arg with_virtual_walls)"/>
+        <arg name="map_name"              value="$(arg map_name)"/>
+    </include>
 
-        <!-- ********************* AMCL ************************* -->
-        <include file="$(find camel_robot)/launch/navigation/amcl.launch">
-            <arg name="robot_name"            value="$(env ROBOT_NAME)" />
-            <arg name="base_frame"            value="$(arg base_frame)" />
-            <arg name="output"                value="$(arg output)" />
-            <arg name="gui_publish_rate"      value="5.0" />
-        </include>
 
-        <!-- ************************ Move Base ******************** -->
-        <include file="$(find camel_robot)/launch/navigation/move_base.launch"/>
-	
-    </group>
+    <!-- ********************* AMCL ************************* -->
+    <include file="$(find camel_robot)/launch/navigation/amcl.launch">
+        <arg name="robot_name"            value="$(arg robot_name)" />
+        <arg name="base_frame"            value="$(arg base_frame)" />
+        <arg name="output"                value="$(arg output)" />
+        <arg name="gui_publish_rate"      value="5.0" />
+    </include>
+
+
+    <!-- ********************* Scripts ************************* -->
+    <node pkg="camel_robot" name="initial_pose_saver" type="amcl_initial_pose_save.py"  output="$(arg output)"  required='true'/>
+    <node pkg="camel_robot" name="goal_saver"         type="goal_pose_saver_service.py" output="$(arg output)"  required='true'/>
+
+
+    <!-- ********************* Move Base ************************* -->
+    <include file="$(find camel_robot)/launch/navigation/move_base.launch">
+        <arg name="robot_name"            value="$(arg robot_name)" />
+        <arg name="base_frame"            value="$(arg base_frame)" />
+        <arg name="output"                value="$(arg output)" />
+        <arg name="local_planner_type"    value="$(arg local_planner_type)"/>
+        <arg name="with_virtual_walls"    value="$(arg with_virtual_walls)"/>
+        <arg name="global_planner"        value="$(arg global_planner)" />
+    </include>
+
+
+    <!-- ********************* TF to Pose ************************* -->
+    <node pkg="camel_robot" type="tf_to_pose.py" name="tf_to_pose" output="$(arg output)" >
+        <param name="rate"          value="10" />
+        <param name="child_frame"   value="$(arg robot_name)/$(arg base_frame)" />
+        <param name="parrent_frame" value="$(arg robot_name)/map" />
+    </node>
+
 </launch>
-
-
-
-
-        

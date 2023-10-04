@@ -77,7 +77,7 @@
         <param name="scan_time"         type="double" value="0.066"/>
         <param name="range_min"         type="double" value="0.05"/>
         <param name="range_max"         type="double" value="2.0"/>
-        <param name="output_frame_id"   type="str"    value="$(arg robot_name)/zed_front_camera_center"/>
+        <param name="output_frame_id"   type="str"    value="$(arg robot_name)/zed_front_base_link"/>
         <remap from="scan"              to="/$(arg robot_name)/depth/scan"/>
     </node>
 

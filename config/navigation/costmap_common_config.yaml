@@ -1,85 +1,177 @@
-robot_base_frame: camel_amr_1000_001/base_footprint
-transform_tolerance: 0.4
-update_frequency: 10.0
-publish_frequency: 2.0
-# obstacle_range: 6.0
+robot_base_frame: camel_amr_500_001/base_footprint
 publish_voxel_map: true
 navigation_map:
-   map_topic: /camel_amr_1000_001/map
-obstacles:
-  observation_sources:  b_scan_marking b_scan_clearing f_scan_marking f_scan_clearing #points_scan
-  b_scan_marking: {
-    sensor_frame: camel_amr_1000_001/back_lidar, 
-    data_type: LaserScan, 
-    topic: /camel_amr_1000_001/back_lidar/scan, 
-    marking: true, 
-    clearing: false, 
-    expected_update_rate: 0.0, 
-    observation_persistence: 0.0, 
-    min_obstacle_height: 0.0, 
-    max_obstacle_height: 2.0, 
-    obstacle_range: 3.0,
-    raytrace_range: 5.5,
-    inf_is_valid: true,
-    track_unknown_space: false}
-    
-  b_scan_clearing:
-    {sensor_frame: camel_amr_1000_001/back_lidar, 
-    data_type: LaserScan, 
-    topic: /camel_amr_1000_001/back_lidar/scan, 
-    marking: false, 
-    clearing: true, 
-    expected_update_rate: 0.0, 
-    observation_persistence: 0.0, 
-    min_obstacle_height: 0.0, 
-    max_obstacle_height: 2.0, 
-    obstacle_range: 3.0,
-    raytrace_range: 5.5,
-    inf_is_valid: true,
-    track_unknown_space: false}
-  f_scan_marking:
-    {sensor_frame: camel_amr_1000_001/front_lidar, 
-    data_type: LaserScan, 
-    topic: /camel_amr_1000_001/front_lidar/scan, 
-    marking: true, 
-    clearing: false, 
-    expected_update_rate: 0.0, 
-    observation_persistence: 0.0, 
-    min_obstacle_height: 0.0, 
-    max_obstacle_height: 2.0, 
-    obstacle_range: 3.0,
-    raytrace_range: 5.5,
-    inf_is_valid: true,
-    track_unknown_space: false}
-  f_scan_clearing:
-    {sensor_frame: camel_amr_1000_001/front_lidar, 
-    data_type: LaserScan, 
-    topic: /camel_amr_1000_001/front_lidar/scan, 
-    marking: false, 
-    clearing: true, 
-    expected_update_rate: 0.0, 
-    observation_persistence: 0.0, 
-    min_obstacle_height: 0.0, 
-    max_obstacle_height: 2.0,
-    obstacle_range: 3.0,
-    raytrace_range: 5.5, 
-    inf_is_valid: true,
-    track_unknown_space: false}
+   map_topic: /camel_amr_500_001/map
 
-  points_scan: { 
-    data_type: LaserScan, 
-    topic: /camel_amr_1000_001/points/scan, 
-    marking: true, 
-    clearing: true, 
-    expected_update_rate: 0.0, 
-    observation_persistence: 0.0, 
-    min_obstacle_height: 0.0, 
-    max_obstacle_height: 0.5,
-    obstacle_range: 3.0,
-    raytrace_range: 3.5,
+obstacles:
+  origin_z: 0.0
+  z_resolution: 0.2
+  z_voxels: 2
+  mark_threshold: 0
+  publish_voxel_map: false
+  footprint_clearing_enabled: true
+
+  observation_sources: scan_marking scan_clearing #depth_scan_marking depth_scan_clearing
+  scan_marking:
+    {sensor_frame: camel_amr_500_001/laser,
+    data_type: LaserScan,
+    topic: /camel_amr_500_001/scan,
+    marking: true,
+    clearing: false,
+    expected_update_rate: 0.0,
+    observation_persistence: 0.0,
+    min_obstacle_height: 0.20,
+    max_obstacle_height: 0.25,
+    obstacle_range: 5.0,
+    raytrace_range: 6.5,
     inf_is_valid: true,
-    track_unknown_space: false}
+    track_unknown_space: true}
+  scan_clearing:
+    {sensor_frame: camel_amr_500_001/laser,
+    data_type: LaserScan,
+    topic: /camel_amr_500_001/scan,
+    marking: false,
+    clearing: true,
+    expected_update_rate: 0.0,
+    observation_persistence: 0.0,
+    min_obstacle_height: 0.20,
+    max_obstacle_height: 0.25,
+    obstacle_range: 5.0,
+    raytrace_range: 6.5,
+    inf_is_valid: true,
+    track_unknown_space: true}
+  depth_scan_marking: {
+    sensor_frame: camel_amr_500_001/zed_front_base_link,
+    data_type: LaserScan,
+    topic: /camel_amr_500_001/depth/scan,
+    marking: true,
+    clearing: true,
+    expected_update_rate: 0.0,
+    observation_persistence: 0.5,
+    min_obstacle_height: 0.0,
+    max_obstacle_height: 2.0,
+    obstacle_range: 1.5,
+    raytrace_range: 5.5,
+    inf_is_valid: true,
+    track_unknown_space: true}
+
+  depth_scan_clearing:
+    {sensor_frame: camel_amr_500_001/zed_front_base_link,
+    data_type: LaserScan,
+    topic: /camel_amr_500_001/depth/scan,
+    marking: true,
+    clearing: true,
+    expected_update_rate: 0.0,
+    observation_persistence: 0.5,
+    min_obstacle_height: 0.0,
+    max_obstacle_height: 2.0,
+    obstacle_range: 1.5,
+    raytrace_range: 5.5,
+    inf_is_valid: true,
+    track_unknown_space: true}
+
+
+voxel:
+
+  origin_z: 0.0
+  z_resolution: 0.2
+  z_voxels: 2
+  mark_threshold: 0
+  publish_voxel_map: false
+  footprint_clearing_enabled: true
+
+  observation_sources: b_scan_marking b_scan_clearing f_scan_marking f_scan_clearing depth_scan_marking depth_scan_clearing
+
+  b_scan_marking: {
+    sensor_frame: camel_amr_500_001/back_lidar,
+    data_type: LaserScan,
+    topic: /camel_amr_500_001/back_lidar/scan,
+    marking: true,
+    clearing: false,
+    expected_update_rate: 0.0,
+    observation_persistence: 0.0,
+    min_obstacle_height: 0.20,
+    max_obstacle_height: 0.25,
+    obstacle_range: 5.0,
+    raytrace_range: 6.5,
+    inf_is_valid: true,
+    track_unknown_space: true}
+
+  b_scan_clearing:
+    {sensor_frame: camel_amr_500_001/back_lidar,
+    data_type: LaserScan,
+    topic: /camel_amr_500_001/back_lidar/scan,
+    marking: false,
+    clearing: true,
+    expected_update_rate: 0.0,
+    observation_persistence: 0.0,
+    min_obstacle_height: 0.20,
+    max_obstacle_height: 0.25,
+    obstacle_range: 5.0,
+    raytrace_range: 6.5,
+    inf_is_valid: true,
+    track_unknown_space: true}
+  f_scan_marking:
+    {sensor_frame: camel_amr_500_001/front_lidar,
+    data_type: LaserScan,
+    topic: /camel_amr_500_001/front_lidar/scan,
+    marking: true,
+    clearing: false,
+    expected_update_rate: 0.0,
+    observation_persistence: 0.0,
+    min_obstacle_height: 0.20,
+    max_obstacle_height: 0.25,
+    obstacle_range: 5.0,
+    raytrace_range: 6.5,
+    inf_is_valid: true,
+    track_unknown_space: true}
+  f_scan_clearing:
+    {sensor_frame: camel_amr_500_001/front_lidar,
+    data_type: LaserScan,
+    topic: /camel_amr_500_001/front_lidar/scan,
+    marking: false,
+    clearing: true,
+    expected_update_rate: 0.0,
+    observation_persistence: 0.0,
+    min_obstacle_height: 0.20,
+    max_obstacle_height: 0.25,
+    obstacle_range: 5.0,
+    raytrace_range: 6.5,
+    inf_is_valid: true,
+    track_unknown_space: true}
+
+  depth_scan_marking: {
+    sensor_frame: camel_amr_500_001/zed_front_base_link,
+    data_type: LaserScan,
+    topic: /camel_amr_500_001/depth/scan,
+    marking: true,
+    clearing: true,
+    expected_update_rate: 0.0,
+    observation_persistence: 0.5,
+    min_obstacle_height: 0.0,
+    max_obstacle_height: 2.0,
+    obstacle_range: 1.5,
+    raytrace_range: 5.5,
+    inf_is_valid: true,
+    track_unknown_space: true}
+
+  depth_scan_clearing:
+    {sensor_frame: camel_amr_500_001/zed_front_base_link,
+    data_type: LaserScan,
+    topic: /camel_amr_500_001/depth/scan,
+    marking: true,
+    clearing: true,
+    expected_update_rate: 0.0,
+    observation_persistence: 0.5,
+    min_obstacle_height: 0.0,
+    max_obstacle_height: 2.0,
+    obstacle_range: 1.5,
+    raytrace_range: 5.5,
+    inf_is_valid: true,
+    track_unknown_space: true}
+
 
 virtual_walls_map:
-  map_topic: /camel_amr_1000_001/virtual_map
+  map_topic: /camel_amr_500_001/virtual_map
   use_maximum: true
+  first_map_only: true

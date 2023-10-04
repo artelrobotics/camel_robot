@@ -1,16 +1,27 @@
 <?xml version="1.0"?>
 <launch>
-    <node pkg="move_base" type="move_base" respawn="true" name="move_base" output="screen" >
 
-        <rosparam file="$(find neo_bot)/params/local_costmap_params.yaml" command="load" />
-        <rosparam file="$(find neo_bot)/params/global_costmap_params.yaml" command="load" />
-        <rosparam file="$(find neo_bot)/params/base_local_planner_params.yaml" command="load" /> 
-        <rosparam file="$(find neo_bot)/params/move_base_params.yaml" command="load" />
-        <rosparam file="$(find neo_bot)/params/global_planner_params.yaml" command="load"/>
+    <!-- ****************** Arguments ******************** -->
+    <arg name="robot_name"            default="$(env ROBOT_NAME)" />
+    <arg name="base_frame"            default="base_footprint" />
+    <arg name="output"                default="log" />
+    <arg name="local_planner_type"    default="base"   doc="[base, dwa, teb]"/>
+    <arg name="with_virtual_walls"    default="false" doc="Enables usage of virtual walls when set. Set to false when running SLAM." />
+    <arg name="global_planner"        default="false" />
 
-        <param name="base_global_planner" value="global_planner/GlobalPlanner" />
-        <param name="base_local_planner" value="base_local_planner/TrajectoryPlannerROS"/> 
-        
-
-    </node> 
+    <node pkg="move_base" type="move_base" respawn="true" name="move_base" output="$(arg output)" >
+        <rosparam file="$(find camel_robot)/config/navigation/costmap_common_config.yaml" command="load" ns="global_costmap" subst_value="true" />
+        <rosparam file="$(find camel_robot)/config/navigation/costmap_common_config.yaml" command="load" ns="local_costmap" subst_value="true" />
+        <rosparam file="$(find camel_robot)/config/navigation/local_costmap_config.yaml"  command="load" />
+        <rosparam file="$(find camel_robot)/config/navigation/global_costmap_config.yaml" command="load" />
+        <rosparam file="$(find camel_robot)/config/navigation/$(arg local_planner_type)_local_planner_config.yaml" command="load"/>
+        <rosparam file="$(find camel_robot)/config/navigation/move_base_config.yaml" command="load" />
+        <rosparam file="$(find camel_robot)/config/navigation/global_costmap_plugins_virtual_walls.yaml" command="load" if="$(arg with_virtual_walls)" />
+        <rosparam file="$(find camel_robot)/config/navigation/local_costmap_plugins_virtual_walls.yaml" command="load" if="$(arg with_virtual_walls)" />
+        <rosparam file="$(find camel_robot)/config/navigation/costmap_converter_params.yaml" command="load" />
+        <param name="base_global_planner" value="navfn/NavfnROS" />
+        <rosparam file="$(find camel_robot)/config/navigation/global_planner_config.yaml" command="load" if="$(arg global_planner)"/>
+        <param name="base_global_planner" value="global_planner/GlobalPlanner" if="$(arg global_planner)"/>
+        <remap from="/$(arg robot_name)/odom" to="/$(arg robot_name)/odometry"/>
+    </node>
 </launch>

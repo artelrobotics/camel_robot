@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <launch>
-    
+
     <arg name="robot_name"            default="$(env ROBOT_NAME)" />
     <arg name="base_frame"            default="base_link" />
     <arg name="output"                default="screen" />
@@ -12,15 +12,15 @@
         <param name="odom_frame_id" value="$(arg robot_name)/odom"/>
         <param name="global_frame_id" value="$(arg robot_name)/map"/>
         <param name="base_frame_id" value="$(arg robot_name)/$(arg base_frame)"/>
-        
+
         <param name="use_map_topic" value="true"/>
         <param name="first_map_only" value="true"/>
         <param name="tf_broadcast" value="true"/>
-    
+
         <param name="initial_cov_xx" value="0.25" />
         <param name="initial_cov_yy" value="0.25" />
         <param name="initial_cov_aa" value="0.068" />
-        
+
 
         <param name="gui_publish_rate" value="$(arg gui_publish_rate)"/>
 
@@ -36,7 +36,7 @@
         <param name="recovery_alpha_fast" value="0.1"/>
         <param name="selective_resampling" value="false"/>
         <param name="save_pose_rate" value="1.0"/>
-            
+
         <param name="odom_model_type" value="diff-corrected"/>
         <param name="odom_alpha1" value="0.005"/> <!-- 0.005 -->
         <param name="odom_alpha2" value="0.005"/> <!-- 0.005 -->

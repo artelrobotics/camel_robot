@@ -1,98 +1,126 @@
 base_local_planner: teb_local_planner/TebLocalPlannerROS
-
+# Default config
 TebLocalPlannerROS:
+  # GoalTolerance
+  xy_goal_tolerance: 0.2 #0.3
+  yaw_goal_tolerance: 0.1 #0.15
+  free_goal_vel: true
+  theta_stopped_vel: 0.1
+  trans_stopped_vel: 0.1
 
- odom_topic: /camel_amr_1000_001/odometry
- map_frame: camel_amr_1000_001/odom
-    
+  # HCPlanning
+  enable_homotopy_class_planning: true
+  enable_multithreading: true
+  max_number_classes: 2
+  max_number_plans_in_current_class: 1
+  selection_cost_hysteresis: 1.0
+  selection_prefer_initial_plan: 0.95
+  selection_obst_cost_scale: 2.0
+  selection_viapoint_cost_scale: 1.0
+  selection_alternative_time_cost: false
+  selection_dropping_probability: 0.0
+  switching_blocking_period: 0.0
+  roadmap_graph_no_samples: 15
+  roadmap_graph_area_width: 5.0
+  roadmap_graph_area_length_scale: 1.0
+  h_signature_prescaler: 1.0
+  h_signature_threshold: 0.1
+  obstacle_heading_threshold: 0.45
+  viapoints_all_candidates: false
+  visualize_hc_graph: false
 
- # Robot  
- max_vel_x: 0.5
- max_vel_x_backwards: 0.2
- max_vel_theta: 0.3
- acc_lim_x: 0.5
- acc_lim_theta: 0.5
- min_turning_radius: 0.0
- footprint_model: # types: "point", "circular", "two_circles", "line", "polygon"
-   type: "line"
-   #  vertices: [[-0.9,-0.6],[-0.9,0.6],[0.9,0.6],[0.9,-0.6]] # for type "polygon"
-   line_start: [-0.5, 0.0] # for type "line"
-   line_end: [0.5, 0.0] # for type "line"
- is_footprint_dynamic: False
+  # Obstacles
+  min_obstacle_dist: 0.2
+  inflation_dist: 0.6
+  dynamic_obstacle_inflation_dist: 1.0
+  include_dynamic_obstacles: true
+  include_costmap_obstacles: true
+  legacy_obstacle_association: false
+  obstacle_association_force_inclusion_factor: 1.5
+  obstacle_association_cutoff_factor: 5.0
+  costmap_obstacles_behind_robot_dist: 1.5
+  obstacle_poses_affected: 15
+  obstacle_proximity_ratio_max_vel: 1.0
+  obstacle_proximity_lower_bound: 0.0
+  obstacle_proximity_upper_bound: 0.5
 
+  # Optimization
+  no_inner_iterations: 5
+  no_outer_iterations: 4
+  optimization_activate: true
+  optimization_verbose: false
+  penalty_epsilon: 0.05
+  weight_max_vel_x: 2.0
+  weight_max_vel_y: 2.0
+  weight_max_vel_theta: 1.0
+  weight_acc_lim_x: 2.0
+  weight_acc_lim_y: 2.0
+  weight_acc_lim_theta: 10.0
+  weight_kinematics_nh: 1000.0
+  weight_kinematics_forward_drive: 500.0
+  weight_kinematics_turning_radius: 1.0
+  weight_optimaltime: 1.0
+  weight_shortest_path: 0.0
+  weight_obstacle: 5.0
+  weight_inflation: 0.1
+  weight_dynamic_obstacle: 50.0
+  weight_dynamic_obstacle_inflation: 5.0
+  weight_velocity_obstacle_ratio: 0.0
+  weight_viapoint: 10.0
+  weight_adapt_factor: 2.0
+  obstacle_cost_exponent: 1.0
 
- # GoalTolerance    
- xy_goal_tolerance: 0.2
- yaw_goal_tolerance: 0.1
- free_goal_vel: False
+  # Recovery
+  shrink_horizon_backup: true
+  shrink_horizon_min_duration: 10.0
+  oscillation_recovery: true
+  divergence_detection_enable: false
+  divergence_detection_max_chi_squared: 10.0
 
+  # Robot
+  max_vel_x: 0.5
+  max_vel_x_backwards: 0.25
+  max_vel_theta: 1.0
+  acc_lim_x: 0.1
+  acc_lim_theta: 0.3
+  is_footprint_dynamic: false
+  use_proportional_saturation: false
+  transform_tolerance: 1.0 #0.5
+  ## Carlike
+  min_turning_radius: 0.0
+  wheelbase: 1.0
+  cmd_angle_instead_rotvel: false
+  ## Omnidirectional
+  max_vel_y: 0.0
+  max_vel_trans: 0.5
+  acc_lim_y: 0.5
 
- # Trajectory
-#  teb_autosize: True
- dt_ref: 0.3
- dt_hysteresis: 0.03
- min_samples: 3
- global_plan_overwrite_orientation: True
- global_plan_viapoint_sep: -0.1 #disabled
- max_global_plan_lookahead_dist: 3.0
- force_reinit_new_goal_dist: 1.0
- feasibility_check_no_poses: 5
- publish_feedback: True
- shrink_horizon_backup: True
- allow_init_with_backwards_motion: True
- exact_arc_length: False
- shrink_horizon_min_duration: 10.0
+  # Footprint
+  footprint_model:
+    type: "polygon"
+    vertices: [[-0.1575,-0.2875],[-0.1575,0.2875],[0.4375,0.2875],[0.4375,-0.2875]]
 
+  # Trajectory
+  teb_autosize: true
+  dt_ref: 0.3
+  dt_hysteresis: 0.1
+  min_samples: 3
+  global_plan_overwrite_orientation: true
+  allow_init_with_backwards_motion: true
+  max_global_plan_lookahead_dist: 5.0
+  force_reinit_new_goal_dist: 1.0
+  force_reinit_new_goal_angular: 0.78
+  feasibility_check_no_poses: 10
+  feasibility_check_lookahead_distance: 1.0
+  exact_arc_length: false
+  publish_feedback: false
+  control_look_ahead_poses: 5
+  prevent_look_ahead_poses_near_goal: 0
+  visualize_with_time_as_z_axis_scale: 0.0
 
- # Obstacles
- min_obstacle_dist: 0.7
- include_costmap_obstacles: True
- costmap_obstacles_behind_robot_dist: 1.0
- obstacle_poses_affected: 10
- inflation_dist: 0.8
- include_dynamic_obstacles: False
- legacy_obstacle_association: False
- obstacle_association_force_inclusion_factor: 2.0
- obstacle_association_cutoff_factor: 5.0
+  # ViaPoints
+  global_plan_viapoint_sep: 0.7
+  via_points_ordered: false
 
-
- # Optimization
- no_inner_iterations: 5
- no_outer_iterations: 4
- penalty_epsilon: 0.1
- weight_max_vel_x: 2
- weight_max_vel_theta: 1
- weight_acc_lim_x: 0.0
- weight_acc_lim_theta: 0.0
- weight_kinematics_nh: 1500
- weight_kinematics_forward_drive: 100
- weight_kinematics_turning_radius: 1
- weight_optimaltime: 1
- weight_obstacle: 50
- weight_viapoint: 1.0
- weight_inflation: 0.1
- weight_adapt_factor: 2.0
- weight_dynamic_obstacle: 10 # not in use yet
- alternative_time_cost: False # not in use yet
- optimization_activate: True
- optimization_verbose: False
-
-
- # Homotopy Class Planner
- enable_homotopy_class_planning: False
- enable_multithreading: True
- simple_exploration: False
- max_number_classes: 2
- selection_cost_hysteresis: 1.0
- selection_obst_cost_scale: 100.0
- selection_viapoint_cost_scale: 1.0
- selection_alternative_time_cost: False
- roadmap_graph_no_samples: 15
- roadmap_graph_area_width: 5
- h_signature_prescaler: 0.5
- h_signature_threshold: 0.1
- obstacle_keypoint_offset: 0.1
- obstacle_heading_threshold: 0.45
- viapoints_all_candidates: True
- switching_blocking_period: 0.0
- visualize_hc_graph: False
+  odom_topic: /camel_amr_500_001/odometry
+  map_frame: camel_amr_500_001/odom

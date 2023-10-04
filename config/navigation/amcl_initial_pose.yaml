@@ -1,3 +1,6 @@
-initial_pose_a: 2.875035844466287
-initial_pose_x: -27.013930245978894
-initial_pose_y: -8.236311341764141
+initial_cov_aa: 0.0
+initial_cov_xx: 0.0
+initial_cov_yy: 0.0
+initial_pose_a: 0.0
+initial_pose_x: 0.0
+initial_pose_y: 0.0

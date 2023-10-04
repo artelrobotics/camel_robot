@@ -8,8 +8,6 @@
     <arg name="map_start_pose"    default="[0.0, 0.0, 0.0]" />
 
 
-
-
     <group if="$(eval type == 'async')">
         <node pkg="slam_toolbox" type="async_slam_toolbox_node" name="slam_toolbox" output="$(arg output)">
             <rosparam command="load" file="$(find camel_robot)/config/slam/st_online_config.yaml" />
