@@ -6,7 +6,7 @@ local_costmap:
     rolling_window: true
     resolution: 0.05
 
-    footprint: [[-1.19,-0.65],[-1.19,0.65],[1.19,0.65],[1.19,-0.65]]
+    footprint: [[-0.647,-0.42],[-0.647,0.42],[0.647,0.42],[0.647,-0.42]]
     footprint_padding: 0.05
     inflation:
       cost_scaling_factor: 2.4 # Exponential rate at which the obstacle cost drops off (default: 10). Must be chosen so that the cost value is > 0 at robot's circumscribed radius.

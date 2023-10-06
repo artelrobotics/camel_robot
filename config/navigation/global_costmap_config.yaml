@@ -5,7 +5,7 @@ global_costmap:
     global_frame: camel_amr_500_001/map
     resolution: 0.2
     rolling_window: false
-    footprint: [[-1.19,-0.65],[-1.19,0.65],[1.19,0.65],[1.19,-0.65]]
+    footprint: [[-0.647,-0.42],[-0.647,0.42],[0.647,0.42],[0.647,-0.42]]
     footprint_padding: 0.05
     inflation:
       cost_scaling_factor: 2.4  # Exponential rate at which the obstacle cost drops off (default: 10). Must be chosen so that the cost value is > 0 at robot's circumscribed radius.
