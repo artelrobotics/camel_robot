@@ -1,9 +1,0 @@
-front_pins:
-      out_pin: 2 
-      input_up: 2
-      input_down: 1
-
-back_pins:
-      out_pin: 1 
-      input_up: 3
-      input_down: 4
