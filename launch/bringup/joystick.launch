@@ -3,6 +3,10 @@
     <arg name="ds4"                   default="$(env DS4)" />
     <arg name="output"                default="screen" />
     <arg name="robot_name"            default="$(env ROBOT_NAME)" />
+    <arg name="autorepeat_rate"       default="10" />
+    <arg name="dev_name"              default="" />
+    <arg name="dev"                   default="/dev/input/js0" />
+    <arg name="dev_ff"                default="dev/input/event13" />
 
     <!-- DualShock4 -->
     <group if="$(arg ds4)">
@@ -18,6 +22,11 @@
     </group>
 
     <group unless="$(arg ds4)">
+        <node pkg="joy" type="joy_node" name="gamepad_joy" output="$(arg output)" >
+            <param name="dev_name"        value="$(arg dev_name)" />
+            <param name="dev"             value="$(arg dev)" />
+            <param name="autorepeat_rate" value="$(arg autorepeat_rate)" />
+        </node>
         <node pkg="arobotics_joystick" type="joy_to_robot.py" name="gamepad" output="screen" >
             <rosparam command="load"                                file="$(find camel_robot)/config/bringup/joystick_config.yaml" />
             <param name="emergency_stop/service_name"   type="str"  value="$(arg robot_name)/driver/emergency_stop_service" />
