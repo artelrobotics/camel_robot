@@ -1,0 +1,9 @@
+PACKAGE_NAME: camel_robot
+# Config name (must be unique)
+config_name: Docking_as_Config
+
+# Reconigurable parametersf
+kp_linear: {type: double, default: 0.3, description: "Kp error of linear vel linear_velocity = self.kp_linear * linear_error - self.kd_linear * distance"}
+kd_linear: {type: double, default: 0.05, description: "Kd error of linear vel"}
+kp_angular: {type: double, default: 0.3, description: "Kp error of angular vel  angular_velocity = self.kp_angular * angular_error - self.kd_angular * angular_error"}
+kd_angular: {type: double, default: 0.05, description: "Kd error of angular vel"}

@@ -1,6 +1,6 @@
 local_costmap:
     transform_tolerance: 1.0
-    update_frequency: 3.0
+    update_frequency: 5.0
     publish_frequency: 3.0
     global_frame: camel_amr_500_001/odom
     rolling_window: true
@@ -18,5 +18,7 @@ local_costmap:
     origin_y: -10.0
 
     plugins:
+      - {name: navigation_map, type: "costmap_2d::StaticLayer" }
       - {name: voxel,      type: "costmap_2d::VoxelLayer" }
       - {name: inflation,  type: "costmap_2d::InflationLayer" }
+      

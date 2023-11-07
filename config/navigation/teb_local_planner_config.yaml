@@ -5,8 +5,8 @@ TebLocalPlannerROS:
   xy_goal_tolerance: 0.2 #0.3
   yaw_goal_tolerance: 0.1 #0.15
   free_goal_vel: true
-  theta_stopped_vel: 0.1
-  trans_stopped_vel: 0.1
+  theta_stopped_vel: 0.01
+  trans_stopped_vel: 0.01
 
   # HCPlanning
   enable_homotopy_class_planning: true
@@ -52,10 +52,10 @@ TebLocalPlannerROS:
   penalty_epsilon: 0.05
   weight_max_vel_x: 2.0
   weight_max_vel_y: 2.0
-  weight_max_vel_theta: 1.0
+  weight_max_vel_theta: 2.0
   weight_acc_lim_x: 2.0
   weight_acc_lim_y: 2.0
-  weight_acc_lim_theta: 10.0
+  weight_acc_lim_theta: 2.0
   weight_kinematics_nh: 1000.0
   weight_kinematics_forward_drive: 500.0
   weight_kinematics_turning_radius: 1.0
@@ -78,27 +78,27 @@ TebLocalPlannerROS:
   divergence_detection_max_chi_squared: 10.0
 
   # Robot
-  max_vel_x: 0.5
+  max_vel_x: 0.7
   max_vel_x_backwards: 0.25
-  max_vel_theta: 1.0
+  max_vel_theta: 0.5
   acc_lim_x: 0.1
-  acc_lim_theta: 0.3
+  acc_lim_theta: 0.2
   is_footprint_dynamic: false
   use_proportional_saturation: false
-  transform_tolerance: 1.0 #0.5
+  transform_tolerance: 0.5
   ## Carlike
   min_turning_radius: 0.0
-  wheelbase: 1.0
+  wheelbase: 0.38
   cmd_angle_instead_rotvel: false
   ## Omnidirectional
   max_vel_y: 0.0
-  max_vel_trans: 0.5
-  acc_lim_y: 0.5
+  max_vel_trans: 0.7
+  acc_lim_y: 0.0
 
   # Footprint
   footprint_model:
     type: "polygon"
-    vertices: [[-0.1575,-0.2875],[-0.1575,0.2875],[0.4375,0.2875],[0.4375,-0.2875]]
+    vertices: [[-0.647,-0.42],[-0.647,0.42],[0.647,0.42],[0.647,-0.42]]
 
   # Trajectory
   teb_autosize: true
@@ -107,11 +107,11 @@ TebLocalPlannerROS:
   min_samples: 3
   global_plan_overwrite_orientation: true
   allow_init_with_backwards_motion: true
-  max_global_plan_lookahead_dist: 5.0
+  max_global_plan_lookahead_dist: 3.0
   force_reinit_new_goal_dist: 1.0
   force_reinit_new_goal_angular: 0.78
   feasibility_check_no_poses: 10
-  feasibility_check_lookahead_distance: 1.0
+  feasibility_check_lookahead_distance: 2.0
   exact_arc_length: false
   publish_feedback: false
   control_look_ahead_poses: 5
@@ -122,5 +122,5 @@ TebLocalPlannerROS:
   global_plan_viapoint_sep: 0.7
   via_points_ordered: false
 
-  odom_topic: /camel_amr_500_001/odometry
+  odom_topic: /camel_amr_500_001/encoder/odom
   map_frame: camel_amr_500_001/odom
