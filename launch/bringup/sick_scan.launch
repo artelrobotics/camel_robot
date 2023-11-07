@@ -10,8 +10,8 @@
     <node name="sick_lms" pkg="sick_scan" type="sick_generic_caller" respawn="false" output="$(arg output)" ns="$(arg ns)" required='true'>
         <param name="intensity" type="bool" value="False"/>
         <param name="intensity_resolution_16bit" type="bool" value="false"/>
-        <param name="min_ang" type="double" value="-2.35619"/>
-        <param name="max_ang" type="double" value="2.35619"/>
+        <param name="min_ang" type="double" value="-2.1"/>
+        <param name="max_ang" type="double" value="2.35"/>
         <param name="frame_id" type="string" value="$(arg frame_id)"/>
         <param name="use_binary_protocol" type="bool" value="true"/>
         <param name="scanner_type" type="string" value="sick_lms_1xx"/>

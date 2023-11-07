@@ -1,0 +1,40 @@
+<?xml version="1.0"?>
+<launch>
+    <arg name="output"                default="screen" />
+    <arg name="robot_name"            default="$(env ROBOT_NAME)" />
+    <arg name="frequency"             default="20" />
+    
+    <!-- Two lidars merger -->
+    <node pkg="ira_laser_tools" name="scan_merger_for_line_extraction" type="laserscan_multi_merger" output="$(arg output)">
+        <param name="destination_frame" value="$(arg robot_name)/laser"/>
+        <param name="cloud_destination_topic" value="/$(arg robot_name)/merged_cloud"/>
+        <param name="scan_destination_topic" value="/$(arg robot_name)/scan_line"/>
+        <param name="laserscan_topics" value ="/$(arg robot_name)/front_lidar/scan /$(arg robot_name)/back_lidar/scan" />
+        <param name="angle_min" value="-3.14159265359"/>
+        <param name="angle_max" value="3.14159265359"/>
+        <param name="angle_increment" value="0.004363323096185923"/>
+        <param name="scan_time" value="0.03999999910593033"/>
+        <param name="range_min" value="0.05"/>
+        <param name="range_max" value="2.5"/>
+    </node>
+
+    
+    <node name="line_extractor" pkg="laser_line_extraction" type="line_extraction_node" output="$(arg output)" required='true'>
+        <param name="~frequency" value="$(arg frequency)" />
+        <param name="~frame_id" value="$(arg robot_name)/laser" />
+        <param name="~scan_topic" value="/$(arg robot_name)/scan_line" />
+        <param name="~publish_markers" value="true" />
+        <param name="~bearing_std_dev" value="1e-5" />
+        <param name="~range_std_dev" value="0.012" />
+        <param name="~least_sq_angle_thresh" value="0.0001" />
+        <param name="~least_sq_radius_thresh" value="0.0001" />
+        <param name="~max_line_gap" value="0.5" />
+        <param name="~min_line_length" value="0.3" />
+        <param name="~min_range" value="0.5" />
+        <param name="~max_range" value="1.5" />
+        <param name="~min_split_dist" value="0.1" />
+        <param name="~outlier_dist" value="0.5" />
+        <param name="~min_line_points" value="10" />
+    </node>
+
+</launch>

@@ -30,6 +30,8 @@
         <node pkg="arobotics_joystick" type="joy_to_robot.py" name="gamepad" output="screen" >
             <rosparam command="load"                                file="$(find camel_robot)/config/bringup/joystick_config.yaml" />
             <param name="emergency_stop/service_name"   type="str"  value="/$(arg robot_name)/driver/emergency_stop_service" />
+            <param name="docking_client/Action_name"    type="str"  value="DockingServer" />
+            <param name="docking_client/cancel_topic"   type="str"  value="/$(arg robot_name)/docking_as/cancel" />
             <param name="hooks/service_name"            type="str"  value="/$(arg robot_name)/hooks_ctrl" />
         </node>
     </group>

@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <launch>
     <arg name="robot_name"            default="$(env ROBOT_NAME)" />
-    <arg name="ds4"                   default="$(env DS4)" />
+    <arg name="ds4"                   default="false" />
     <arg name="base_frame"            default="base_footprint" />
     <arg name="output"                default="screen" />
     <arg name="front_lidar_ip"        default="192.168.1.3" />
@@ -73,9 +73,9 @@
     <node name="depthimage_to_laserscan" pkg="depthimage_to_laserscan" type="depthimage_to_laserscan" args="">
         <remap from="image"             to="/$(arg robot_name)/front/zed2/depth/depth_registered"/>
         <remap from="camera_info"       to="/$(arg robot_name)/front/zed2/depth/camera_info"/>
-        <param name="scan_height"       type="int"    value="60"/>
+        <param name="scan_height"       type="int"    value="1"/>
         <param name="scan_time"         type="double" value="0.066"/>
-        <param name="range_min"         type="double" value="0.05"/>
+        <param name="range_min"         type="double" value="0.1"/>
         <param name="range_max"         type="double" value="2.0"/>
         <param name="output_frame_id"   type="str"    value="$(arg robot_name)/zed_front_base_link"/>
         <remap from="scan"              to="/$(arg robot_name)/depth/scan"/>
@@ -86,8 +86,8 @@
     <include file="$(find camel_robot)/launch/bringup/aruco_detect.launch">
         <arg name="robot_name"              value="$(arg robot_name)" />
         <arg name="output"                  value="$(arg output)" />
-        <arg name="camera"                  value="/$(arg robot_name)/front/zed2/rgb/image_rect_color/compressed"/>
-        <arg name="camera_info"             value="/$(arg robot_name)/front/zed2/rgb/camera_info"/>
+        <arg name="camera"                  value="/$(arg robot_name)/front/zed2/left/image_rect_color/compressed"/>
+        <arg name="camera_info"             value="/$(arg robot_name)/front/zed2/left/camera_info"/>
     </include>
 
 
@@ -96,7 +96,7 @@
         <arg name="robot_name"              value="$(arg robot_name)" />
         <arg name="output"                  value="$(arg output)" />
         <arg name="marker_frame"            value="fiducial_1"/>
-        <arg name="base_frame"              value="base_link" />
+        <arg name="base_frame"              value="base_footprint" />
         <arg name="odom_frame"              value="odom"/>
     </include>
 
