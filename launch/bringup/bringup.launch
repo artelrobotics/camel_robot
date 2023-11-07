@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <launch>
     <arg name="robot_name"            default="$(env ROBOT_NAME)" />
-    <arg name="ds4"                   default="false" />
+    <arg name="ds4"                   default="$(env DS4)" />
     <arg name="base_frame"            default="base_footprint" />
     <arg name="output"                default="screen" />
     <arg name="front_lidar_ip"        default="192.168.1.3" />
