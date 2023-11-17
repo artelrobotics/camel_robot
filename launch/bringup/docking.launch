@@ -5,48 +5,26 @@
     <arg name="base_frame"                    default="base_footprint" />
     <arg name="output"                        default="screen" />
     <arg name="odom_frame"                    default="odom"/>
-    <arg name="marker_frame"                  default="fiducial_1"/>
+    <arg name="marker_frame_1"                default="fiducial_1"/>
+    <arg name="marker_frame_2"                default="fiducial_2"/>
     <arg name="interval"                      default="0.05"/>
     <arg name="transform_tolerance"           default="0.5"/>
     <arg name="freq"                          default="10.0"/>
     <arg name="laser_frequency"               default="20" />
      
-    <!-- Two lidars merger -->
-    <node pkg="ira_laser_tools" name="scan_merger_for_line_extraction" type="laserscan_multi_merger" output="$(arg output)">
-        <param name="destination_frame" value="$(arg robot_name)/laser"/>
-        <param name="cloud_destination_topic" value="/$(arg robot_name)/merged_cloud"/>
-        <param name="scan_destination_topic" value="/$(arg robot_name)/scan_line"/>
-        <param name="laserscan_topics" value ="/$(arg robot_name)/front_lidar/scan /$(arg robot_name)/back_lidar/scan" />
-        <param name="angle_min" value="-2.14159265359"/>
-        <param name="angle_max" value="2.14159265359"/>
-        <param name="angle_increment" value="0.004363323096185923"/>
-        <param name="scan_time" value="0.03999999910593033"/>
-        <param name="range_min" value="0.05"/>
-        <param name="range_max" value="1.5"/>
+    <!-- Docking Path Planner for fiducial_1 -->
+    <node name="docking_path_planner_1"  pkg="docking_server" type="docking_path_planner.py" output="$(arg output)" required='true'>
+        <param name="marker_frame"        value="$(arg marker_frame_1)"/>
+        <param name="robot_frame"         value="$(arg robot_name)/$(arg base_frame)"/>
+        <param name="world_frame"         value="$(arg robot_name)/$(arg odom_frame)"/>
+        <param name="interval"            value="$(arg interval)"/>
+        <param name="transform_tolerance" value="$(arg transform_tolerance)"/>
+        <param name="freq"                value="$(arg freq)"/>
     </node>
 
-    <!-- Line Extraction -->
-    <node name="line_extractor" pkg="laser_line_extraction" type="line_extraction_node" output="$(arg output)" required='true'>
-        <param name="~frequency" value="$(arg laser_frequency)" />
-        <param name="~frame_id" value="$(arg robot_name)/laser" />
-        <param name="~scan_topic" value="/$(arg robot_name)/scan_line" />
-        <param name="~publish_markers" value="true" />
-        <param name="~bearing_std_dev" value="1e-5" />
-        <param name="~range_std_dev" value="0.012" />
-        <param name="~least_sq_angle_thresh" value="0.1" />
-        <param name="~least_sq_radius_thresh" value="0.1" />
-        <param name="~max_line_gap" value="0.7" />
-        <param name="~min_line_length" value="0.3" />
-        <param name="~min_range" value="0.5" />
-        <param name="~max_range" value="1.0" />
-        <param name="~min_split_dist" value="0.1" />
-        <param name="~outlier_dist" value="0.1" />
-        <param name="~min_line_points" value="15" />
-    </node>
-
-    <!-- Docking Path Planner -->
-    <node name="docking_path_planner"  pkg="docking_server" type="docking_path_planner.py" output="$(arg output)" required='true'>
-        <param name="marker_frame"        value="$(arg marker_frame)"/>
+    <!-- Docking Path Planner for fiducial_2 -->
+    <node name="docking_path_planner_2"  pkg="docking_server" type="docking_path_planner.py" output="$(arg output)" required='true'>
+        <param name="marker_frame"        value="$(arg marker_frame_2)"/>
         <param name="robot_frame"         value="$(arg robot_name)/$(arg base_frame)"/>
         <param name="world_frame"         value="$(arg robot_name)/$(arg odom_frame)"/>
         <param name="interval"            value="$(arg interval)"/>

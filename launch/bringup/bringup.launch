@@ -95,7 +95,8 @@
     <include file="$(find camel_robot)/launch/bringup/docking.launch">
         <arg name="robot_name"              value="$(arg robot_name)" />
         <arg name="output"                  value="$(arg output)" />
-        <arg name="marker_frame"            value="fiducial_1"/>
+        <arg name="marker_frame_1"          value="fiducial_1"/>
+        <arg name="marker_frame_2"          value="fiducial_2"/>
         <arg name="base_frame"              value="base_footprint" />
         <arg name="odom_frame"              value="odom"/>
     </include>
@@ -112,8 +113,11 @@
         <param name="odom0" value="/$(arg robot_name)/encoder/odom"/>
         <param name="odom0_queue_size" value="2"/>
 
-        <param name="imu0" value="/$(arg robot_name)/front/zed2/imu/data"/>
-        <param name="imu0_queue_size" value="5"/>
+        <param name="odom1" value="/$(arg robot_name)/front/zed2/odom"/>
+        <param name="odom1_queue_size" value="2"/>
+
+        <!-- <param name="imu0" value="/$(arg robot_name)/front/zed2/imu/data"/>
+        <param name="imu0_queue_size" value="5"/> -->
 
         <remap from="/$(arg robot_name)/odometry/filtered" to="/$(arg robot_name)/odometry"/>
         <remap from="/$(arg robot_name)/accel/filtered" to="/$(arg robot_name)/accel"/>

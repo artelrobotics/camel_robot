@@ -51,4 +51,13 @@
         <param name="parrent_frame" value="$(arg robot_name)/map" />
     </node>
 
+     <!-- Docking Action Server -->
+    <node name="docking_as"  pkg="docking_server" type="docking_as.py" output="$(arg output)" required='true'> 
+        <param name="kp_linear"         value="0.1"/>
+        <param name="kd_linear"         value="0.01"/>
+        <param name="kp_angular"        value="0.7"/>
+        <param name="kd_angular"        value="0.1"/>
+        
+    </node>
+    
 </launch>

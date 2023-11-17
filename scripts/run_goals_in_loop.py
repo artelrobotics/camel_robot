@@ -46,12 +46,18 @@ if __name__ == "__main__":
                 result = client.get_result()
                 if result:
                     rospy.loginfo(f'Goal {goal_names[0]} execution done')
-                    if(goal_names[0] == "C"):
+                    if(goal_names[0] == "B"):
                         dock = DockingGoal()
                         dock.aruco_id = 1
                         dock.type = "docking"
                         client_dock.send_goal_and_wait(dock,execute_timeout=rospy.Duration(120))
-                        break
+
+                    if(goal_names[0] == "D"):
+                        dock = DockingGoal()
+                        dock.aruco_id = 1
+                        dock.type = "undocking"
+                        client_dock.send_goal_and_wait(dock,execute_timeout=rospy.Duration(120))
+        
                     goal_names.append(goal_names.pop(0))
                     time.sleep(5)
                 else:
