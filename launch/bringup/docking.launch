@@ -7,6 +7,7 @@
     <arg name="odom_frame"                    default="odom"/>
     <arg name="marker_frame_1"                default="fiducial_1"/>
     <arg name="marker_frame_2"                default="fiducial_2"/>
+    <arg name="marker_frame_3"                default="fiducial_3"/>
     <arg name="interval"                      default="0.05"/>
     <arg name="transform_tolerance"           default="0.5"/>
     <arg name="freq"                          default="10.0"/>
@@ -25,6 +26,16 @@
     <!-- Docking Path Planner for fiducial_2 -->
     <node name="docking_path_planner_2"  pkg="docking_server" type="docking_path_planner.py" output="$(arg output)" required='true'>
         <param name="marker_frame"        value="$(arg marker_frame_2)"/>
+        <param name="robot_frame"         value="$(arg robot_name)/$(arg base_frame)"/>
+        <param name="world_frame"         value="$(arg robot_name)/$(arg odom_frame)"/>
+        <param name="interval"            value="$(arg interval)"/>
+        <param name="transform_tolerance" value="$(arg transform_tolerance)"/>
+        <param name="freq"                value="$(arg freq)"/>
+    </node>
+
+    <!-- Docking Path Planner for fiducial_3 -->
+    <node name="docking_path_planner_3"  pkg="docking_server" type="docking_path_planner.py" output="$(arg output)" required='true'>
+        <param name="marker_frame"        value="$(arg marker_frame_3)"/>
         <param name="robot_frame"         value="$(arg robot_name)/$(arg base_frame)"/>
         <param name="world_frame"         value="$(arg robot_name)/$(arg odom_frame)"/>
         <param name="interval"            value="$(arg interval)"/>

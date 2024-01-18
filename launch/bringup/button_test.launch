@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<launch>
+
+    <arg name="output"                default="screen" />
+
+    <!-- Button Control -->
+    <node pkg="camel_robot" type="button_status.py" name="button_status" output="$(arg output)">
+        <param name="button_pin" type="int" value="1"/>
+    </node>
+
+
+</launch>

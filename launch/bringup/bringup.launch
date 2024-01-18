@@ -97,6 +97,7 @@
         <arg name="output"                  value="$(arg output)" />
         <arg name="marker_frame_1"          value="fiducial_1"/>
         <arg name="marker_frame_2"          value="fiducial_2"/>
+        <arg name="marker_frame_3"          value="fiducial_3"/>
         <arg name="base_frame"              value="base_footprint" />
         <arg name="odom_frame"              value="odom"/>
     </include>
@@ -133,6 +134,11 @@
 
     <!-- Robot Status -->
     <node pkg="camel_robot" type="robot_status.py" name="robot_status" output="$(arg output)" />
+
+    <!-- Button Control -->
+    <node pkg="camel_robot" type="button_status.py" name="button_status" output="$(arg output)">
+        <param name="button_pin" type="int" value="1"/>
+    </node>
 
 
     <!-- Multimaster -->

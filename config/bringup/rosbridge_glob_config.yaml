@@ -1,6 +1,3 @@
-topics_glob: "[/camel_amr_1000_001/robot_status, /camel_amr_1000_001/bms/data, /camel_amr_1000_001/cmd_vel, /camel_amr_1000_001/odometry, 
-/camel_amr_1000_001/task_compelation, /camel_amr_1000_001/amcl_pose, /camel_amr_1000_001/move_base/cancel, /camel_amr_1000_001/move_base/current_goal,
-/camel_amr_1000_001/move_base/feedback, /camel_amr_1000_001/move_base/goal, /camel_amr_1000_001/move_base/result, /camel_amr_1000_001/move_base/status,
-/camel_amr_1000_001/map, /camel_amr_1000_001/virtual_map, /camel_amr_1000_001/initialpose]"  # "" nothing "[/rosout, etc]" specified
-services_glob: "[/camel_amr_1000_001/Docking_server, /camel_amr_1000_001/Pose_saver_service]" # "" nothing "[/rosout, etc]" specified
+topics_glob: "*"  # "" nothing "[/rosout, etc]" specified
+services_glob: "*" # "" nothing "[/rosout, etc]" specified
 params_glob: "" # "" nothing "[/rosout, etc]" specified

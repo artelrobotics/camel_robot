@@ -32,9 +32,15 @@ class TfToPose:
             return None
 
     def get_pose(self) -> PoseStamped:
-        transform = self.get_transform(self.child_frame, self.parent_frame)
+        transform = self.get_transform(self.parent_frame, self.child_frame)
         if transform is not None:
-            pose_stamped = tf2_geometry_msgs.do_transform_pose(PoseStamped(), transform)
+            pose_stamped = PoseStamped()
+            pose_stamped.header.frame_id = self.parent_frame
+            pose_stamped.header.stamp = rospy.Time.now()
+            pose_stamped.pose.position.x = transform.transform.translation.x
+            pose_stamped.pose.position.y = transform.transform.translation.y
+            pose_stamped.pose.position.z = transform.transform.translation.z
+            pose_stamped.pose.orientation = transform.transform.rotation
             return pose_stamped
         else:
             return None

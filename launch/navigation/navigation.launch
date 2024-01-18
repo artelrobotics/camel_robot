@@ -8,7 +8,7 @@
     <arg name="local_planner_type"    default="teb"   doc="[base, dwa, teb]"/>
     <arg name="with_virtual_walls"    default="false"  doc="Enables usage of virtual walls when set. Set to false when running SLAM." />
     <arg name="map_name"              default=""/>
-    <arg name="global_planner"        default="false" />
+    <arg name="global_planner"        default="true" />
 
     <!-- ************************ Map Server ************************* -->
     <include file="$(find camel_robot)/launch/navigation/map_server.launch">
@@ -48,7 +48,7 @@
     <node pkg="camel_robot" type="tf_to_pose.py" name="tf_to_pose" output="$(arg output)" >
         <param name="rate"          value="10" />
         <param name="child_frame"   value="$(arg robot_name)/$(arg base_frame)" />
-        <param name="parrent_frame" value="$(arg robot_name)/map" />
+        <param name="parent_frame" value="$(arg robot_name)/map" />
     </node>
 
      <!-- Docking Action Server -->
