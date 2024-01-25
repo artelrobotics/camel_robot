@@ -20,13 +20,18 @@
 
 
     <!-- ********************* AMCL ************************* -->
-    <include file="$(find camel_robot)/launch/navigation/amcl.launch">
+    <!-- <include file="$(find camel_robot)/launch/navigation/amcl.launch">
         <arg name="robot_name"            value="$(arg robot_name)" />
         <arg name="base_frame"            value="$(arg base_frame)" />
         <arg name="output"                value="$(arg output)" />
         <arg name="gui_publish_rate"      value="5.0" />
-    </include>
+    </include> -->
 
+    <!-- ********************* MCL ************************* -->
+    <include file="$(find camel_robot)/launch/navigation/als_mcl.launch">
+        <arg name="robot_name"            value="$(arg robot_name)" />
+        <arg name="base_frame"            value="$(arg base_frame)" />
+    </include>
 
     <!-- ********************* Scripts ************************* -->
     <node pkg="camel_robot" name="initial_pose_saver" type="amcl_initial_pose_save.py"  output="$(arg output)"  required='true'/>

@@ -4,7 +4,7 @@
     <arg name="robot_name"            default="$(env ROBOT_NAME)" />
     <arg name="base_frame"            default="base_link" />
     <arg name="output"                default="screen" />
-    <arg name="gui_publish_rate"      default="5.0" />
+    <arg name="gui_publish_rate"      default="-1.0" />
     <arg name="M_PI"                  value="3.141592654"/>
 
     <node pkg="amcl" type="amcl" name="amcl" output="screen" respawn="true">
